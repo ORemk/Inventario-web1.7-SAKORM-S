@@ -29,8 +29,8 @@
                     el.removeAttribute('onclick');
                     el.removeAttribute('data-onclick');
 
-                    // Only allow simple function calls: name and optional args in parentheses
-                    const m = raw.trim().match(/^([A-Za-z_$][0-9A-Za-z_$]*)\s*(?:\((.*)\))?\s*;?\s*$/);
+                    // Only allow simple function calls: name and optional args in parentheses, optionally with return
+                    const m = raw.trim().match(/^(?:return\s+)?([A-Za-z_$][0-9A-Za-z_$]*)\s*(?:\((.*)\))?\s*;?\s*$/);
                     if (!m) {
                         console.warn('inline-handler skipped unsafe code:', raw);
                         return;
