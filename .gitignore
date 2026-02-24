@@ -2,6 +2,9 @@
 *.log
 .DS_Store
 
+# Node.js
+node_modules/
+
 # IDE
 .vscode/
 .idea/
