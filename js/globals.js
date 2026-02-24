@@ -10,7 +10,13 @@
 		try{
 			var baseEl = document.querySelector('base');
 			var baseHref = '/';
-			if (baseEl && baseEl.getAttribute('href')) baseHref = baseEl.getAttribute('href');
+			if (baseEl && baseEl.href) {
+				try {
+					baseHref = new URL(baseEl.href).pathname;
+				} catch(e) {
+					baseHref = '/';
+				}
+			}
 			// Normalize to ensure leading and trailing slash
 			if (!baseHref.startsWith('/')) baseHref = '/' + baseHref;
 			if (!baseHref.endsWith('/')) baseHref = baseHref + '/';
