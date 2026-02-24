@@ -1,0 +1,30 @@
+# PHP
+*.log
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Environment
+.env
+.env.local
+
+# Cache
+.cache/
+*.cache
+
+# SQL Server
+*.bak
+*.trn

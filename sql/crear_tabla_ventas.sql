@@ -1,0 +1,8 @@
+-- Tabla ventas
+CREATE TABLE IF NOT EXISTS ventas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -1,0 +1,2349 @@
+/* ARCHIVADO: custom.css
+   Este archivo se considera obsoleto. Sus reglas han sido
+   consolidadas en `app.css`. Para evitar conflictos con las
+   definiciones canónicas, el contenido histórico se ha eliminado
+   y este archivo queda como marcador.
+*/
+
+/* placeholder: see app.css for active styles */
+
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.3);
+}
+
+.calc-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.calc-btn {
+  padding: 14px !important;
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
+  color: #ff9800 !important;
+  border: 2px solid #ffb74d !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.15) !important;
+}
+
+.calc-btn:hover {
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%) !important;
+  color: #fff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(255, 152, 0, 0.3) !important;
+}
+
+.calc-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.15) !important;
+}
+
+.calc-btn.calc-func {
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%) !important;
+  color: #fff !important;
+  border-color: #43cea2 !important;
+}
+
+.calc-btn.calc-func:hover {
+  background: linear-gradient(135deg, #185a9d 0%, #00bcd4 100%) !important;
+  box-shadow: 0 6px 16px rgba(67, 206, 162, 0.3) !important;
+}
+
+.calc-btn.calc-equal {
+  background: linear-gradient(135deg, #ff6f61 0%, #ff5252 100%) !important;
+  color: #fff !important;
+  border-color: #ff6f61 !important;
+  font-size: 1.5rem !important;
+}
+
+.calc-btn.calc-equal:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%) !important;
+  box-shadow: 0 6px 16px rgba(255, 111, 97, 0.3) !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(420px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+  }
+}
+
+/* Resaltado persistente para secciones activas: dura ~7s (la parte JS controla la duración) */
+.selected-highlight {
+  background: linear-gradient(90deg, rgba(102,126,234,0.06), rgba(16,185,129,0.03));
+  border-left: 6px solid rgba(16,185,129,0.95);
+  transition: background 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+  box-shadow: 0 8px 30px rgba(16,185,129,0.08);
+}
+
+/* Pequeña transición de salida */
+.selected-highlight-fade {
+  transition: background 300ms ease, box-shadow 300ms ease, opacity 250ms ease;
+  background: transparent;
+  box-shadow: none;
+  border-left-color: transparent;
+}
+
+/* Resaltado de fila tras acción (ej. eliminar): breve pulso y fade */
+.row-highlight {
+  animation: row-highlight-pulse 1.1s ease-out;
+}
+@keyframes row-highlight-pulse {
+  0% { background: rgba(220, 252, 231, 0.95); }
+  40% { background: rgba(220, 252, 231, 0.6); }
+  100% { background: transparent; }
+}
+
+/* Ajustes generales de diseño */
+/* Corrección: Ajuste de tamaños de fuente */
+body {
+  background: var(--color-bg-gradient);
+  color: var(--color-secondary);
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 0.2px;
+  transition: background 0.7s, color 0.5s;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1300px; /* Ancho máximo aumentado para más espacio */
+  margin: 0 auto; /* Centrar el contenedor */
+  padding: 40px 40px 40px 40px; /* Padding simétrico en todos los lados */
+  margin-right: 120px; /* Espacio para botones flotantes */
+}
+
+input, button, label {
+  font-size: 16px; /* Ajustar el tamaño de los elementos del formulario */
+}
+
+/* Estilo general para todos los botones */
+button {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  color: var(--color-secondary);
+  box-shadow: 0 4px 16px #ff980044;
+}
+
+/* Botones específicos con íconos */
+button i {
+  margin-right: 8px;
+  font-size: 16px;
+  vertical-align: middle; /* Alinear íconos verticalmente */
+}
+
+/* Botones de acción en tablas */
+.btn-accion {
+  background-color: transparent;
+  color: #555;
+  padding: 8px;
+  border-radius: 5px;
+  transition: transform 0.3s, color 0.3s;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+.btn-accion i {
+  color: #555;
+  transition: color 0.3s;
+}
+.btn-accion:hover {
+  color: #4CAF50;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Botones de acción específicos */
+.btn-editar {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  border: none;
+}
+.btn-editar:hover {
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-eliminar {
+  background-color: #f44336;
+  color: white;
+  border-radius: 5px;
+  padding: 8px 15px;
+  font-size: 14px;
+  border: none;
+  transition: background-color 0.3s, transform 0.3s;
+}
+.btn-eliminar:hover {
+  background-color: #d32f2f;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-eliminar:focus,
+.btn-eliminar:focus-visible {
+  outline: 3px solid rgba(244,67,54,0.15);
+  box-shadow: 0 0 0 6px rgba(244,67,54,0.06);
+  transform: scale(1.05);
+}
+
+/* Spinner & loading state used by dialog action buttons */
+.btn.is-loading {
+  position: relative;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.btn.is-loading .spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: rgba(255,255,255,1);
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* AI Chat: controls and chunked message styles */
+.ai-chat-msg { margin: 8px 12px; padding: 10px; border-radius: 8px; }
+.ai-chat-content { white-space: pre-wrap; line-height:1.45; }
+.ai-chat-controls { display:flex; gap:8px; margin-top:8px; }
+.ai-chat-controls .btn { padding:6px 10px; font-size:0.85rem; }
+.ai-chat-msg.chunked { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); border:1px solid rgba(0,0,0,0.04); }
+.ai-chat-msg.chunked:focus { outline: 2px solid rgba(0,123,255,0.15); box-shadow:0 0 0 6px rgba(0,123,255,0.04); }
+.ai-chat-content.collapsed { max-height: 120px; overflow: hidden; position: relative; }
+.ai-chat-content.collapsed:after { content: ''; position: absolute; left:0; right:0; bottom:0; height:40px; background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,1)); }
+
+/* Help button & live region */
+.ai-help-btn { margin-left: 8px; padding: 6px 8px; font-size: 0.9rem; background: transparent; border: 1px solid rgba(0,0,0,0.06); border-radius: 6px; cursor: pointer; }
+.ai-help-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.ai-chat-live.visually-hidden { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+
+/* Chat body scroll and custom scrollbar */
+.ai-chat-body { overflow-y: auto; max-height: 360px; -webkit-overflow-scrolling: touch; position: relative; padding-right: 12px; }
+.ai-scroll-track { position: absolute; top: 48px; right: 8px; width: 10px; bottom: 72px; border-radius: 999px; background: rgba(0,0,0,0.02); display:flex; align-items:flex-start; justify-content:center; transition:opacity 0.16s ease; opacity:0; pointer-events:none; z-index:20; }
+.ai-scroll-thumb { width: 8px; background: rgba(0,0,0,0.35); border-radius: 999px; transform: translateY(0); transition: transform 0.12s linear; }
+.ai-scroll-thumb.dragging { background: rgba(0,0,0,0.6); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+.ai-scroll-track:hover { opacity: 1; pointer-events: auto; }
+.ai-chat-body::-webkit-scrollbar { width: 10px; }
+.ai-chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 8px; }
+.ai-chat-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
+
+/* Hide native scrollbar when user chooses the custom-only mode */
+.ai-chat-body.hide-native { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+.ai-chat-body.hide-native::-webkit-scrollbar { display: none !important; }
+
+/* Scroll-to-bottom button */
+.ai-scroll-to-bottom { position: absolute; right: 12px; bottom: 56px; z-index: 25; background: linear-gradient(135deg,#ff9800 0%,#ffb74d 100%); color: #fff; border:none; width:40px; height:40px; border-radius: 8px; display:flex; align-items:center; justify-content:center; box-shadow: 0 6px 20px rgba(0,0,0,0.12); cursor:pointer; opacity:0; pointer-events:none; transition: opacity 0.18s ease, transform 0.15s ease; }
+.ai-scroll-to-bottom:hover { transform: translateY(-4px); }
+.ai-scroll-to-bottom:focus { outline: 3px solid rgba(255,183,77,0.18); }
+/* visible class shows the button */
+.ai-scroll-to-bottom.visible { opacity:1; pointer-events:auto; }
+/* show class triggers a temporary pulse and tooltip reveal */
+.ai-scroll-to-bottom.show { animation: ai-pulse 0.9s ease; }
+.ai-scroll-to-bottom::after { content: 'Ir al último'; position: absolute; bottom: 48px; right: 0; transform: translateY(8px); opacity: 0; transition: opacity 0.18s ease, transform 0.18s ease; background: rgba(0,0,0,0.78); color: #fff; padding:6px 8px; border-radius:6px; font-size:0.85rem; white-space:nowrap; z-index:26; }
+.ai-scroll-to-bottom.visible::after, .ai-scroll-to-bottom:hover::after, .ai-scroll-to-bottom.show::after { opacity:1; transform: translateY(0); }
+
+/* Badge showing count */
+.ai-scroll-to-bottom .ai-scroll-count { position: absolute; top: -6px; right: -6px; background: #ff3d00; color: #fff; font-size: 0.7rem; font-weight:700; padding: 2px 6px; border-radius: 999px; box-shadow: 0 6px 12px rgba(0,0,0,0.12); display: none; min-width: 20px; text-align:center; transition: transform 220ms ease, box-shadow 220ms ease; }
+.ai-scroll-to-bottom .ai-scroll-count.pulse { animation: ai-badge-pulse 420ms cubic-bezier(.2,.9,.3,1); transform-origin: 50% 50%; }
+@keyframes ai-badge-pulse { 0% { transform: scale(1); box-shadow: 0 6px 12px rgba(0,0,0,0.12); } 40% { transform: scale(1.18); box-shadow: 0 10px 18px rgba(0,0,0,0.18); } 100% { transform: scale(1); box-shadow: 0 6px 12px rgba(0,0,0,0.12); } }
+.ai-scroll-to-bottom .ai-scroll-count::after { content: ''; display:inline-block; width:0; height:0; }
+
+@keyframes ai-pulse { 0% { transform: scale(0.96); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
+
+
+/* Botones de acción en cuadros de diálogo */
+.dialog-box button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Validation feedback */
+.field-error {
+  border-color: #e53935 !important;
+  box-shadow: 0 0 0 3px rgba(229,57,53,0.06) !important;
+}
+.error-msg {
+  color: #c62828;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.dialog-box button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* Estilos para el cuadro de diálogo de importar/exportar */
+.accion-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out; /* Reducir duración de la animación */
+}
+
+.accion-dialog-box {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Ajustar sombra */
+  animation: scaleIn 0.3s ease-in-out; /* Reducir duración de la animación */
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.accion-dialog-box h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.accion-dialog-box p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.accion-dialog-box.accion-exito {
+  border-left: 5px solid #4CAF50;
+}
+
+.accion-dialog-box.accion-error {
+  border-left: 5px solid #f44336;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Botones de acción en los cuadros de diálogo */
+.accion-dialog-box button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.accion-dialog-box button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* Estilos para los filtros y orden */
+.filtros-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  background: linear-gradient(to right, #f0f8ff, #e8f5e9);
+  border: 2px solid #4CAF50;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 1);
+  margin-bottom: 30px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.filtro-seccion, .orden-seccion {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filtros-container h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.filtros-container label {
+  font-weight: bold;
+  color: #555;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.filtros-container input, .filtros-container select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-size: 14px;
+}
+
+.filtros-container input:focus, .filtros-container select:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Botones de acción en los filtros */
+.botones-filtro {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  align-items: center;
+  flex: 1;
+}
+
+.btn-limpiar, .btn-aplicar {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease; /* Simplificar transición */
+}
+
+.btn-limpiar:hover {
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  color: var(--color-secondary);
+  box-shadow: 0 4px 16px #ff980044;
+}
+
+.btn-aplicar:hover {
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  color: var(--color-secondary);
+  box-shadow: 0 4px 16px #ff980044;
+}
+
+/* Botones */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Diseño actualizado para la tabla de productos */
+/* Consistencia de ancho para todos los contenedores */
+.section form {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section form label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.section form input,
+.section form select,
+.section form textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.section form input:focus,
+.section form select:focus,
+.section form textarea:focus {
+  border-color: #43cea2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(67, 206, 162, 0.1);
+}
+
+.section .table-container,
+.section .import-export,
+.section .filtros-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+.table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Sombra ligera */
+  border: 3px solid #4CAF50; /* Borde verde */
+  background: linear-gradient(to bottom, #ffffff, #f9f9f9); /* Fondo bicolor */
+  padding: 10px;
+  width: 100%;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px #43cea244;
+}
+
+.table-container th, .table-container td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1.5px solid #e3ffe8;
+  font-size: 1.05rem;
+}
+
+.table-container th {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: #fff;
+  font-weight: 700;
+}
+
+.table-container tr:hover {
+  background: #e3ffe8;
+}
+
+/* Estilo para la columna de acciones */
+.table-container table td:last-child {
+  background-color: #fce4ec;
+  color: #d81b60;
+  font-weight: bold;
+}
+.table-container table td:last-child:hover {
+  background-color: #f8bbd0;
+  color: #ad1457;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ajuste del estilo para la columna de Fecha y Hora de Registro */
+.table-container table th:nth-child(6),
+.table-container table td:nth-child(6) {
+  background-color: #f9f9f9;
+  color: #333;
+  text-align: center;
+  font-size: 14px;
+  font-family: 'Arial', sans-serif;
+  padding: 10px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.table-container table tr:hover td:nth-child(6) {
+  background-color: #ffeb3b;
+  color: #000;
+  /* Eliminar transform para evitar salto visual */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ajuste del color del texto en la columna de categoría */
+.table-container table th:nth-child(7),
+.table-container table td:nth-child(7) {
+  color: #4CAF50;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.table-container table td:nth-child(7):hover {
+  color: #388E3C;
+  transition: color 0.3s ease-in-out;
+}
+
+/* Mejora del color del texto en la tabla de productos */
+.table-container table td {
+  color: #555;
+  font-size: 14px;
+  text-align: center;
+  padding: 10px;
+  transition: color 0.3s ease-in-out;
+}
+.table-container table tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+.table-container table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+.table-container table tr:hover {
+  background: linear-gradient(to right, #e8f5e9, #f0f8ff);
+  color: #000;
+  /* Eliminar transform para evitar salto visual */
+  transition: background-color 0.3s ease-in-out;
+}
+th, td {
+  padding: 15px 20px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+th {
+  background: linear-gradient(to right, #4CAF50, #2196F3);
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 14px;
+}
+tr:nth-child(odd) {
+  background-color: #f8f8f8;
+}
+tr:nth-child(even) {
+  background-color: #ffffff;
+}
+tr:hover {
+  background-color: #e0f7fa;
+  /* Eliminar transform para evitar salto visual */
+  transition: background-color 0.3s ease;
+  background: linear-gradient(to right, #e8f5e9, #f0f8ff);
+}
+td img {
+  border-radius: 5px;
+  max-width: 50px;
+  max-height: 50px;
+  object-fit: cover;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Corrección: Se agregó un estilo para el botón de cancelar edición */
+.btn-cancelar {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-cancelar:hover {
+  background-color: #d32f2f;
+  transform: scale(1.05);
+}
+
+/* Mejora del diseño de las secciones */
+.section {
+  margin: 30px auto; /* Centrar todas las secciones */
+  padding: 30px; /* Padding interno consistente */
+  background: linear-gradient(to bottom right, #ffffff, #f9f9f9); /* Fondo bicolor */
+  border: 4px solid transparent; /* Borde inicial transparente */
+  border-image: linear-gradient(to right, #4CAF50, #2196F3); /* Borde bicolor */
+  border-image-slice: 1;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+  max-width: 1250px; /* Aumentado para más espacio */
+  width: 100%;
+}
+
+.section:hover {
+  transform: scale(1.03);
+  background: linear-gradient(to bottom right, #f7f7f7, #e8f5e9); /* Fondo bicolor al pasar el cursor */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border-color: #4CAF50; /* Cambiar el color del borde al pasar el cursor */
+}
+
+/* Mejora de los encabezados de las secciones */
+.section h2 {
+  font-size: 24px; /* Reducir tamaño de fuente */
+  color: #333;
+  margin-bottom: 15px; /* Ajustar margen inferior */
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #4CAF50, #2196F3); /* Texto bicolor */
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Mejora de los botones */
+.section .btn {
+  background: linear-gradient(to right, #4CAF50, #2196F3); /* Fondo bicolor */
+  color: white;
+  padding: 10px 20px; /* Ajustar padding */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px; /* Unificar tamaño de fuente */
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Simplificar transición */
+}
+
+.section .btn:hover {
+  background: linear-gradient(to right, #2196F3, #4CAF50); /* Invertir colores al pasar el cursor */
+  transform: scale(1.05); /* Reducir escala */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Mejora de los cuadros de diálogo */
+.dialog-box {
+  border: 4px solid transparent; /* Borde inicial transparente */
+  border-image: linear-gradient(to right, #4CAF50, #2196F3); /* Borde bicolor */
+  border-image-slice: 1;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.dialog-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border-color: #2196F3; /* Cambiar el color del borde al pasar el cursor */
+}
+
+/* Mejora de los inputs */
+input, select {
+  border: 2px solid var(--color-primary);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 1.08rem;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+  background: #f7fafd;
+  color: var(--color-secondary);
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus {
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 2px 8px #ffb74d44;
+  outline: none;
+}
+
+/* Estilo mejorado para la sección de productos registrados */
+#productos {
+  background: linear-gradient(to bottom, #f0f8ff, #e8f5e9); /* Fondo bicolor */
+  border: 3px solid #4CAF50; /* Borde verde */
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Sombra */
+  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+}
+
+#productos:hover {
+  transform: scale(1.02); /* Efecto de zoom */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+  background: linear-gradient(to bottom, #e8f5e9, #f0f8ff); /* Fondo invertido */
+}
+
+/* Encabezado de la sección */
+#productos h2 {
+  font-size: 26px;
+  color: #333;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  background: linear-gradient(to right, #4CAF50, #2196F3); /* Texto bicolor */
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Estilos para el formulario de contacto */
+.contact-form-container {
+  margin-top: 20px;
+  padding: 25px;
+  background: linear-gradient(to right, #f0f8ff, #e8f5e9);
+  border: 3px solid #4CAF50;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 1s ease-in-out;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.contact-form-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.contact-form-container h3 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #4CAF50, #2196F3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.contact-form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact-form-container label {
+  font-weight: bold;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-form-container input,
+.contact-form-container textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background: #f9f9f9;
+}
+
+.contact-form-container input:focus,
+.contact-form-container textarea:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+  background: #ffffff;
+}
+
+.contact-form-container textarea {
+  resize: none;
+}
+
+.contact-form-container button {
+  background: linear-gradient(to right, #4CAF50, #2196F3);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.contact-form-container button:hover {
+  background: linear-gradient(to right, #2196F3, #4CAF50);
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.contact-form-container button i {
+  font-size: 18px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* --- Modo Futurista Mejorado UX/UI --- */
+body.ai-enhanced {
+  background: linear-gradient(135deg, #181c2b 0%, #2c5364 100%) !important;
+  color: #00ffcc !important;
+  transition: background 0.7s, color 0.5s;
+}
+body.ai-enhanced .main-header,
+body.ai-enhanced .footer {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+  box-shadow: 0 8px 32px #0fffc1cc, 0 2px 16px #7e0fff88;
+  border-radius: 18px;
+  border: 2.5px solid #0fffc1;
+}
+body.ai-enhanced .navbar {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  box-shadow: 0 4px 16px #0fffc1cc;
+}
+body.ai-enhanced .navbar-menu li a {
+  color: #181c2b !important;
+  background: transparent !important;
+  border: 2px solid #0fffc1 !important;
+  transition: all 0.3s;
+}
+body.ai-enhanced .navbar-menu li a:hover {
+  color: #fff !important;
+  background: #7e0fff !important;
+  border-color: #0fffc1 !important;
+  box-shadow: 0 4px 16px #7e0fff88;
+}
+body.ai-enhanced .container,
+body.ai-enhanced .section,
+body.ai-enhanced .table-container,
+body.ai-enhanced .import-export,
+body.ai-enhanced #tabla-ejemplo,
+body.ai-enhanced #registro-productos,
+body.ai-enhanced #formulario-inventario {
+  background: linear-gradient(135deg, #23294a 0%, #181c2b 100%) !important;
+  color: #00ffcc !important;
+  border: 2.5px solid #0fffc1 !important;
+  box-shadow: 0 8px 32px #0fffc1cc, 0 2px 16px #7e0fff88;
+}
+body.ai-enhanced .section h2,
+body.ai-enhanced .contact-form-container h3 {
+  color: #0fffc1 !important;
+  text-shadow: 0 0 10px #0fffc1, 0 0 20px #7e0fff;
+  background: none !important;
+}
+body.ai-enhanced .table-container th {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+}
+body.ai-enhanced .table-container td {
+  color: #fff !important;
+}
+body.ai-enhanced .fab-btn,
+body.ai-enhanced .fab-calc,
+
+/* Navbar active state (mejora visual para accesibilidad) */
+.navbar-link.active {
+  background: linear-gradient(90deg, rgba(102,126,234,0.12), rgba(102,126,234,0.06));
+  color: var(--color-primary) !important;
+  border-radius: 8px;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+  box-shadow: 0 6px 18px rgba(102,126,234,0.08);
+}
+.navbar-link.active i { color: var(--color-primary-dark) !important; }
+.navbar-link[aria-current="page"] { box-shadow: inset 0 -3px 0 rgba(102,126,234,0.12); }
+
+
+body.ai-enhanced .fab-ai,
+body.ai-enhanced .fab-whatsapp,
+body.ai-enhanced .fab-login {
+  background: linear-gradient(135deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+  border: 2.5px solid #0fffc1 !important;
+  box-shadow: 0 8px 32px #0fffc1cc, 0 2px 16px #7e0fff88 !important;
+  filter: brightness(1.15) drop-shadow(0 0 12px #0fffc1);
+  display: flex !important;
+  visibility: visible !important;
+  z-index: 10020 !important;
+}
+body.ai-enhanced .fab-btn:hover,
+body.ai-enhanced .fab-calc:hover,
+body.ai-enhanced .fab-ai:hover {
+  background: linear-gradient(135deg, #7e0fff 0%, #0fffc1 100%) !important;
+  color: #fff !important;
+  border-color: #7e0fff !important;
+  box-shadow: 0 12px 36px #7e0fffcc, 0 2px 16px #0fffc188 !important;
+  transform: scale(1.12) rotate(-8deg);
+}
+body.ai-enhanced .btn,
+body.ai-enhanced button,
+body.ai-enhanced .btn-agregar-producto,
+body.ai-enhanced .btn-editar,
+body.ai-enhanced .btn-eliminar,
+body.ai-enhanced .btn-limpiar,
+body.ai-enhanced .btn-aplicar {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+  border: 2px solid #0fffc1 !important;
+  box-shadow: 0 4px 16px #0fffc1cc;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+}
+body.ai-enhanced .btn:hover,
+body.ai-enhanced button:hover {
+  background: linear-gradient(90deg, #7e0fff 0%, #0fffc1 100%) !important;
+  color: #fff !important;
+  border-color: #7e0fff !important;
+}
+body.ai-enhanced input,
+body.ai-enhanced select,
+body.ai-enhanced textarea {
+  background: #23294a !important;
+  color: #0fffc1 !important;
+  border: 2px solid #0fffc1 !important;
+  box-shadow: 0 2px 8px #0fffc1cc;
+}
+body.ai-enhanced input:focus,
+body.ai-enhanced select:focus,
+body.ai-enhanced textarea:focus {
+  border-color: #7e0fff !important;
+  box-shadow: 0 4px 16px #7e0fff88;
+  color: #fff !important;
+}
+body.ai-enhanced .dialog-box.futurista {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+  border: 2.5px solid #0fffc1 !important;
+  box-shadow: 0 8px 32px #0fffc1cc, 0 2px 16px #7e0fff88 !important;
+}
+body.ai-enhanced .dialog-box.futurista h2 {
+  color: #181c2b !important;
+  text-shadow: 0 0 10px #0fffc1, 0 0 20px #7e0fff;
+}
+body.ai-enhanced .dialog-box.futurista button {
+  background: linear-gradient(90deg, #7e0fff 0%, #0fffc1 100%) !important;
+  color: #fff !important;
+  border: 2px solid #7e0fff !important;
+}
+body.ai-enhanced .dialog-box.futurista button:hover {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+  border-color: #0fffc1 !important;
+}
+body.ai-enhanced .ai-chatbot {
+  background: linear-gradient(135deg, #181c2b 0%, #2c5364 100%) !important;
+  color: #0fffc1 !important;
+  border: 2.5px solid #0fffc1 !important;
+  box-shadow: 0 8px 32px #0fffc1cc, 0 2px 16px #7e0fff88 !important;
+}
+body.ai-enhanced .ai-chat-header {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+}
+body.ai-enhanced .ai-chat-close {
+  color: #181c2b !important;
+}
+body.ai-enhanced .ai-chat-close:hover {
+  color: #7e0fff !important;
+}
+body.ai-enhanced .ai-chat-body {
+  color: #0fffc1 !important;
+}
+body.ai-enhanced .ai-chat-msg-bot {
+  background: linear-gradient(90deg, #0fffc1 0%, #7e0fff 100%) !important;
+  color: #181c2b !important;
+}
+body.ai-enhanced .ai-chat-msg-user {
+  background: #23294a !important;
+  color: #fff !important;
+}
+body.ai-enhanced .ai-chat-input {
+  border-top: 1.5px solid #0fffc1 !important;
+  background: #23294a !important;
+}
+body.ai-enhanced .ai-chat-input input {
+  background: transparent !important;
+  color: #0fffc1 !important;
+}
+body.ai-enhanced .ai-chat-input button {
+  color: #0fffc1 !important;
+}
+body.ai-enhanced .ai-chat-input button:hover {
+  color: #7e0fff !important;
+}
+body.ai-enhanced .ai-chat-status {
+  background: #23294a !important;
+  color: #0fffc1 !important;
+  border-top: 1px solid #0fffc1 !important;
+}
+
+/* --- CALCULADORA Y CHATBOT: SOLO UNA DEFINICIÓN POR SELECTOR --- */
+
+/* Calculadora digital mejorada */
+/* Contenedor de la calculadora dentro del overlay */
+.calculator-container {
+  min-width: 220px;
+  width: 250px;
+  max-width: 90vw;
+  padding: 18px 10px 14px 10px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fffbe6 0%, #ffe0c3 100%);
+  box-shadow: 0 12px 48px #ffb74d55, 0 2px 16px #ff980044;
+  border: 2.5px solid #ff9800;
+  z-index: 11000 !important;
+  transition: all 0.3s;
+  transform: scale(0.9) translateY(20px);
+}
+
+.calculator-modal.active .calculator-container {
+  transform: scale(1) translateY(0);
+  box-shadow: 0 16px 56px #ffb74d77, 0 4px 24px #ff980055;
+}
+
+.calculator-modal h3 {
+  font-size: 1.08rem;
+  margin-bottom: 10px;
+  color: #ff9800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.calculator-display {
+  width: 100%;
+  height: 36px;
+  margin-bottom: 12px;
+  font-size: 1.08rem;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 2px solid #ff9800;
+  background: #fffbe6;
+  color: #ff6f61;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.calculator-display:focus {
+  border: 2px solid #ff6f61;
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+  outline: none;
+}
+
+.calculator-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 44px);
+  grid-template-rows: repeat(5, 38px);
+  gap: 8px 7px;
+  justify-content: center;
+  margin-bottom: 6px;
+  width: 100%;
+  max-width: 180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.calculator-keys button {
+  font-size: 1rem;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 12px #ffb74d44, 0 0 8px #ff980044;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s, font-size 0.18s;
+  outline: none;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+}
+.calculator-keys .key-op {
+  font-size: 1rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #2196F3 0%, #43cea2 100%);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 16px #43cea244;
+  border: 2px solid #43cea2;
+  filter: brightness(1.15) saturate(1.18);
+}
+.calculator-keys .key-equals {
+  font-size: 1.1rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+  color: #fff;
+  font-weight: bold;
+}
+.calculator-keys .key-clear {
+  font-size: 0.95rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #db4437 0%, #e57373 100%);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 16px #db443744;
+  border: 2px solid #db4437;
+  filter: brightness(1.12) saturate(1.12);
+}
+.calculator-keys button:hover, .calculator-keys button:focus {
+  background: linear-gradient(90deg, #43cea2 0%, #b2fefa 100%);
+  color: #185a9d;
+  transform: scale(1.11);
+  box-shadow: 0 4px 20px #43cea288;
+  filter: brightness(1.22) saturate(1.22);
+}
+.copy-result-btn {
+  background: #43cea2;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 7px 18px;
+  font-size: 0.95rem;
+  margin-left: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-weight: 600;
+  box-shadow: 0 2px 8px #43cea244;
+}
+.copy-result-btn:hover {
+  background: #185a9d;
+  color: #fffbe6;
+}
+.calculator-history {
+  background: #e3f2fd;
+  border-radius: 7px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #185a9d;
+  max-height: 60px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px #43cea244;
+}
+.calculator-history-title {
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+  color: #2196f3;
+  font-weight: bold;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    max-width: 1150px;
+    margin-right: 100px;
+  }
+  .section {
+    max-width: 1100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 1000px;
+    margin-right: 80px;
+    padding: 30px;
+  }
+  .section {
+    max-width: 950px;
+    padding: 25px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    max-width: 90vw;
+    margin-right: auto;
+    padding: 20px;
+  }
+  .section {
+    max-width: 90vw;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  .section form input,
+  .section form select,
+  .section form textarea {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+  .calculator-modal {
+    min-width: 90vw;
+    width: 95vw;
+    max-width: 99vw;
+    padding: 10px 2vw 10px 2vw;
+    border-radius: 12px;
+    margin-right: 0;
+  }
+  .calculator-keys {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 30px);
+    gap: 5px 5px;
+    max-width: 100vw;
+  }
+  .calculator-keys button {
+    font-size: 0.92rem;
+    border-radius: 7px;
+  }
+  .calculator-display {
+    font-size: 0.98rem;
+    height: 28px;
+    border-radius: 7px;
+    padding: 5px 6px;
+  }
+}
+
+/* Distribución didáctica y diseño funcional de botones */
+#calculatorModal .calculator-keys {
+  display: grid;
+  grid-template-areas:
+    'clear clear perc sqrt'
+    'seven eight nine div'
+    'four five six mul'
+    'one two three sub'
+    'zero zero dot add'
+    'equals equals equals equals';
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 14px;
+  width: 100%;
+  margin-top: 18px;
+  justify-items: center;
+}
+#calculatorModal .calculator-keys button {
+  font-size: 1.22rem;
+  padding: 18px 0;
+  border-radius: 16px;
+  min-width: 54px;
+  min-height: 44px;
+  background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 2px 12px #ffb74d44, 0 0 8px #ff980044;
+  border: none;
+  margin: 0 2px;
+  transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.18s;
+  outline: none;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Tarjetas principales para secciones de ventas, salidas, clientes, proveedores --- */
+.main-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  margin: 36px 0 48px 0;
+}
+
+.section-card {
+  background: linear-gradient(135deg, #fffbe6 70%, #ffe0c3 100%);
+  border-radius: 22px;
+  box-shadow: 0 8px 32px #ffb88c33, 0 2px 16px #ff980033;
+  padding: 38px 36px 30px 36px;
+  min-width: 260px;
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.3s, transform 0.3s, background 0.3s;
+  margin-bottom: 0;
+  margin-top: 0;
+  border: 2.5px solid #ff980022;
+  position: relative;
+}
+
+.section-card h2 {
+  font-size: 2.1rem;
+  color: #ff9800;
+  font-family: 'Montserrat', 'Poppins', sans-serif;
+  font-weight: 900;
+  margin-bottom: 12px;
+  text-align: center;
+  text-shadow: 0 2px 12px #ffecd2cc;
+  letter-spacing: 1.2px;
+}
+
+.section-card p {
+  color: #a65c00;
+  font-size: 1.18rem;
+  text-align: center;
+  margin-bottom: 18px;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.section-card .btn-section {
+  background: linear-gradient(90deg, #43cea2 0%, #2196F3 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px #43cea244;
+  transition: background 0.25s, color 0.2s, box-shadow 0.2s, transform 0.18s;
+  cursor: pointer;
+}
+
+.section-card .btn-section:hover {
+  background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+  color: #fffbe6;
+  transform: scale(1.07);
+  box-shadow: 0 6px 24px #ffb88c55;
+}
+
+.section-card:hover {
+  box-shadow: 0 12px 36px #ffb88c55, 0 2px 16px #ff980044;
+  background: linear-gradient(135deg, #ffe0c3 70%, #fffbe6 100%);
+  transform: translateY(-8px) scale(1.03);
+  border-color: #ff9800;
+}
+
+@media (max-width: 1100px) {
+  .main-sections {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .section-card {
+    min-width: 220px;
+    max-width: 98vw;
+    padding: 28px 10vw 22px 10vw;
+  }
+}
+
+@media (max-width: 700px) {
+  .main-sections {
+    flex-direction: column;
+    gap: 18px;
+    align-items: center;
+  }
+  .section-card {
+    min-width: 0;
+    max-width: 98vw;
+    width: 98vw;
+    padding: 22px 4vw 18px 4vw;
+  }
+  .section-card h2 {
+    font-size: 1.4rem;
+  }
+  .section-card p {
+    font-size: 1rem;
+  }
+  .section-card .btn-section {
+    font-size: 1rem;
+    padding: 10px 18px;
+  }
+}
+
+/* FAB Buttons: diseño circular, sombra y animación flotante */
+.fab-btn,
+.fab-calc,
+.fab-ai,
+.fab-whatsapp,
+.fab-login {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    border-radius: 50% !important;
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 56px;
+    min-height: 56px;
+    max-width: 90px;
+    max-height: 90px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+    animation: floatBtn 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+    z-index: 10020 !important;
+    visibility: visible !important;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Botón flotante de la calculadora: borde y color especial */
+.fab-calc {
+    background: linear-gradient(135deg,#fffbe6 0%,#ffe0c3 100%) !important;
+    color: #ff9800 !important;
+    border: 3.5px solid #ff9800 !important;
+    box-shadow: 0 12px 40px rgba(255, 183, 77, 0.25), 0 2px 12px rgba(255, 152, 0, 0.2) !important;
+}
+
+/* Ícono más grande solo para la calculadora */
+.fab-calc i {
+    font-size: 2.7rem !important;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Animación flotante suave para los FAB */
+@keyframes floatBtn {
+  0%, 100% { 
+    transform: translateY(0) translateX(0);
+  }
+  50% { 
+    transform: translateY(-12px) translateX(0);
+  }
+}
+
+/* Efecto hover para FAB - mejorado */
+.fab-btn:hover,
+.fab-calc:hover,
+.fab-ai:hover,
+.fab-whatsapp:hover,
+.fab-login:hover {
+    transform: scale(1.15) rotate(-5deg) translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15);
+    filter: brightness(1.1);
+}
+
+/* Efecto activo/click */
+.fab-btn:active,
+.fab-calc:active,
+.fab-ai:active,
+.fab-whatsapp:active,
+.fab-login:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Estado persistente cuando el FAB está activo (clase .active aplicada por JS) */
+.fab-btn.active,
+.fab-calc.active,
+.fab-ai.active,
+.fab-whatsapp.active,
+.fab-login.active {
+    transform: translateY(-6px) scale(1.08);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.28), 0 6px 18px rgba(0,0,0,0.12);
+    outline: 3px solid rgba(255,255,255,0.6);
+    border-radius: 50%;
+    filter: saturate(1.08) brightness(1.02);
+}
+
+/* Indicación visual adicional para modos (AI enhance) */
+.fab-ai.active { box-shadow: 0 20px 60px rgba(126,0,255,0.25), 0 8px 24px rgba(0,0,0,0.12); }
+.fab-ai[id="btnAIEnhance"].active { outline: 3.5px solid rgba(142,68,173,0.18); }
+
+/* Tooltip personalizado */
+.fab-btn[title]::after,
+.fab-calc[title]::after,
+.fab-ai[title]::after,
+.fab-whatsapp[title]::after,
+.fab-login[title]::after {
+    content: attr(title);
+    position: absolute;
+    right: 85px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.fab-btn:hover[title]::after,
+.fab-calc:hover[title]::after,
+.fab-ai:hover[title]::after,
+.fab-whatsapp:hover[title]::after,
+.fab-login:hover[title]::after {
+    opacity: 1;
+}
+
+/* Responsive: tamaño menor en móvil */
+@media (max-width: 600px) {
+  .fab-btn, .fab-calc, .fab-ai, .fab-whatsapp, .fab-login {
+    width: 62px !important;
+    height: 62px !important;
+    font-size: 1.7rem !important;
+    bottom: auto !important;
+    right: 14px !important;
+  }
+  
+  .fab-btn[title]::after,
+  .fab-calc[title]::after,
+  .fab-ai[title]::after,
+  .fab-whatsapp[title]::after,
+  .fab-login[title]::after {
+    display: none;
+  }
+  
+  /* Reposicionar botones en móvil con espaciado de 80px */
+  .fab-whatsapp {
+    bottom: 15px !important;
+  }
+  
+  .fab-login {
+    bottom: 95px !important;
+  }
+  
+  .fab-calc {
+    bottom: 175px !important;
+  }
+  
+  .fab-ai[id="btnAIChat"] {
+    bottom: 255px !important;
+  }
+  
+  .fab-ai[id="btnAI"] {
+    bottom: 335px !important;
+  }
+  
+  .fab-calc i {
+    font-size: 2.1rem !important;
+  }
+}
+
+/* Botón "Subir" al inicio (scroll-top) */
+.scroll-top-btn {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 10030;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  /* Mantener en el DOM para permitir animación CSS */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(12px) scale(0.92);
+  pointer-events: none;
+  transition: transform 320ms cubic-bezier(.2,.9,.2,1), box-shadow 320ms, opacity 320ms, background 240ms;
+}
+
+@keyframes scroll-entrance {
+  0%   { transform: translateY(18px) scale(0.86); opacity: 0; }
+  60%  { transform: translateY(-6px) scale(1.08); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Estado visible: fade-in + slide-up (con 'bump') */
+.scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  animation: scroll-entrance 420ms cubic-bezier(.2,.9,.2,1);
+  box-shadow: 0 18px 56px rgba(0,0,0,0.28);
+  transform: translateY(0) scale(1);
+}
+
+/* Hover/Focus: aumentar tamaño y cambiar color */
+.scroll-top-btn:hover, .scroll-top-btn:focus {
+  transform: translateY(-6px) scale(1.12);
+  box-shadow: 0 24px 72px rgba(0,0,0,0.32);
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  outline: none;
+}
+
+@media (max-width:600px) { .scroll-top-btn { right: 18px; bottom: 120px; width:48px;height:48px; font-size:1.1rem; } }
+
+/* Hamburger menu styles */
+.nav-hamburger-btn{
+  background:transparent;border:none;color:var(--color-primary);font-size:1.2rem;margin-right:12px;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background 0.18s,transform 0.12s;
+}
+.nav-hamburger-btn:hover{background:rgba(102,126,234,0.06);transform:scale(1.03)}
+.hamburger-menu{display:none;position:absolute;left:12px;top:56px;background:#fff;border:1px solid #e6eefc;padding:10px;border-radius:10px;box-shadow:0 10px 30px rgba(102,126,234,0.12);z-index:10030;min-width:260px;opacity:0;transform:translateY(-6px);transition:opacity 0.18s,transform 0.18s}
+.hamburger-menu.show{display:block;opacity:1;transform:translateY(0)}
+.hamburger-content{display:flex;flex-direction:column;gap:8px}
+.hamburger-title{font-weight:700;color:var(--color-primary);font-size:0.95rem}
+.hamburger-row{display:flex;gap:8px;align-items:center}
+.hamburger-sep{border:none;border-top:1px solid #f0f4ff;margin:6px 0}
+.hamburger-menu .btn{flex:1}
+
+@media (max-width:720px){
+  .hamburger-menu{left:10px;right:10px;min-width:auto}
+}
+
+/* Navbar improvements */
+.navbar{position:sticky;top:0;z-index:10020;background:linear-gradient(90deg,var(--color-primary) 0%, rgba(102,126,234,0.9) 100%);color:#fff;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,0.08);}
+.navbar-container{display:flex;align-items:center;gap:12px;max-width:1200px;margin:0 auto;}
+.navbar-left{display:flex;align-items:center;gap:8px;}
+.navbar-brand-link{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:700;font-size:1.05rem}
+.navbar-brand-link i{font-size:1.2rem}
+.navbar-center{flex:1;display:flex;justify-content:center}
+
+.navbar-brand-text{display:inline-block;color:#fff; /* fallback color if gradient/text-clip not supported */}
+
+/* Prevent brand from taking excessive horizontal space and avoid overlaying menu */
+.navbar-brand{min-width:0;max-width:260px;overflow:hidden}
+.navbar-left{flex:0 0 auto;display:flex;align-items:center;gap:8px}
+.navbar-menu{flex:1;justify-content:center}
+
+/* Ensure logo-box doesn't overlay the navbar (lower z-index) */
+#logo-box{position:relative;z-index:1}
+/* Keep logo-btns non-interactive while hidden; when shown JS should toggle a .visible class */
+#logo-btns{pointer-events:none;opacity:0;transition:opacity 0.22s ease}
+#logo-btns.visible{pointer-events:auto;opacity:1}
+
+.navbar-menu{display:flex;list-style:none;margin:0;padding:0;gap:8px;align-items:center}
+.navbar-item .navbar-link{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:#fff;text-decoration:none;transition:background 0.14s}
+.navbar-item .navbar-link:hover{background:rgba(255,255,255,0.06)}
+.navbar-item .navbar-link i{opacity:0.95}
+
+/* Fix: ensure navbar labels are visible and readable */
+.navbar-item .navbar-link span{
+  display:inline-block !important;
+  color:inherit !important;
+  opacity:1 !important;
+  font-weight:600;
+  font-size:0.95rem;
+  line-height:1;
+  text-shadow:0 1px 0 rgba(0,0,0,0.12);
+}
+.navbar-item .navbar-link i{
+  margin-right:6px;
+  font-size:1.05rem;
+}
+
+/* If some responsive rule hides text, override it to keep labels on larger screens */
+@media (min-width: 580px){
+  .navbar-link span{display:inline-block !important}
+}
+
+/* UX improvements: stronger contrast, larger hit targets and focus styles */
+.navbar-menu .navbar-link{
+  color: #ffffff !important;
+  padding: 10px 16px !important;
+  gap: 10px !important;
+  border-radius:10px !important;
+}
+.navbar-menu .navbar-link span{
+  color: rgba(255,255,255,0.95) !important;
+  font-weight:600 !important;
+}
+/* Defensive: ensure labels never disappear or match background due to other overrides */
+.navbar-menu .navbar-link span{
+  display: inline-block !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+  -webkit-font-smoothing: antialiased !important;
+  font-size: 0.95rem !important;
+}
+.navbar-menu .navbar-link:hover{
+  background: rgba(255,255,255,0.08) !important;
+  transform: translateY(-2px) !important;
+}
+.navbar-menu .navbar-link:focus-visible{
+  outline: 3px solid rgba(255,255,255,0.16);
+  outline-offset: 3px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Ensure icons remain visually consistent */
+.navbar-menu .navbar-link i{font-size:1.05rem; opacity:1 !important}
+
+/* Keep labels visible on most sizes; allow icon-only on very small screens if desired */
+@media (max-width:360px){
+  .navbar-menu .navbar-link span{display:none !important}
+  .navbar-menu .navbar-link{padding:10px !important}
+}
+
+/* Responsive: collapse main menu on small screens and show hamburger */
+@media (max-width:900px){
+  .navbar-center{display:none}
+  .navbar-menu{display:none}
+  .nav-hamburger-btn{display:inline-flex}
+}
+@media (min-width:901px){
+  .nav-hamburger-btn{display:none}
+}
+
+/* Floating FAB common animation and spacing + positioning */
+#floating-buttons-wrapper {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  align-items:center;
+  z-index:10020;
+}
+.fab-btn { animation: fab-pulse 1.6s infinite alternate; transition: transform 0.18s ease, box-shadow 0.18s ease; display:inline-flex;align-items:center;justify-content:center;border-radius:50%; }
+.fab-btn:focus, .fab-btn:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 12px 36px rgba(0,0,0,0.18); }
+.fab-ai{width:72px;height:72px;font-size:2.2rem}
+.fab-btn{width:64px;height:64px;font-size:1.9rem}
+
+@media (max-width:720px){
+  #floating-buttons-wrapper{right:16px;bottom:18px;top:auto;transform:none;flex-direction:row;gap:12px;padding:4px}
+  .fab-btn{width:56px;height:56px;font-size:1.6rem}
+  .fab-ai{width:64px;height:64px;font-size:1.9rem}
+}
+
+@keyframes fab-pulse {
+  0% { transform: translateY(0); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+  100% { transform: translateY(-4px); box-shadow: 0 18px 46px rgba(0,0,0,0.18); }
+}
+
+
+/* Estado visible: fade-in + slide-up */
+.scroll-top-btn.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.25);
+}
+
+.scroll-top-btn:hover { transform: translateY(-6px) scale(1.05); box-shadow: 0 18px 46px rgba(0,0,0,0.28); }
+.scroll-top-btn:focus { outline: 3px solid rgba(255,255,255,0.12); }
+@media (max-width:600px) { .scroll-top-btn { right: 18px; bottom: 120px; width:44px;height:44px; } }
+
+/* === ESTILOS BASE DEL CHATBOT AI === */
+.ai-chatbot {
+  position: fixed;
+  bottom: 120px;
+  right: 20px;
+  z-index: 11000;
+  width: 360px;
+  max-width: 90vw;
+  height: 500px;
+  background: linear-gradient(135deg, #fffbe6 0%, #ffe0c3 100%);
+  border: 2.5px solid #ff9800;
+  border-radius: 22px;
+  box-shadow: 0 16px 56px rgba(255, 152, 0, 0.3), 0 4px 20px rgba(255, 152, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.ai-chatbot.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 20px 68px rgba(255, 152, 0, 0.4), 0 6px 24px rgba(255, 152, 0, 0.3);
+}
+
+.ai-chat-header {
+  background: linear-gradient(90deg, #ff9800 0%, #ff6f61 100%);
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #ff6f61;
+  font-weight: 700;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.ai-chat-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-chat-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.ai-chat-close:active {
+  transform: scale(0.95);
+}
+
+.ai-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fffbe6;
+  scroll-behavior: smooth;
+}
+
+.ai-chat-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-chat-body::-webkit-scrollbar-track {
+  background: #fff3e0;
+  border-radius: 3px;
+}
+
+.ai-chat-body::-webkit-scrollbar-thumb {
+  background: #ffb74d;
+  border-radius: 3px;
+}
+
+.ai-chat-body::-webkit-scrollbar-thumb:hover {
+  background: #ff9800;
+}
+
+.ai-chat-msg {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  max-width: 85%;
+  word-wrap: break-word;
+  animation: fadeInMsg 0.3s ease;
+}
+
+@keyframes fadeInMsg {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-chat-msg-bot {
+  align-self: flex-start;
+  background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+  color: #fff;
+  border-radius: 0 12px 12px 12px;
+  box-shadow: 0 2px 8px rgba(67, 206, 162, 0.2);
+}
+
+.ai-chat-msg-user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+  color: #fff;
+  border-radius: 12px 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.ai-chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 2px solid #ffb74d;
+  background: #fff3e0;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+.ai-chat-input input {
+  flex: 1;
+  border: 1.5px solid #ffb74d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  background: #fffbe6;
+  color: #a65c00;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+
+.ai-chat-input input::placeholder {
+  color: #ffb88c;
+  font-style: italic;
+}
+
+.ai-chat-input input:focus {
+  outline: none;
+  border-color: #ff9800;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.ai-chat-input button {
+  background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.ai-chat-input button:hover {
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.ai-chat-input button:active {
+  transform: scale(0.95);
+}
+
+.ai-chat-status {
+  background: #fff3e0;
+  color: #ff9800;
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-top: 1.5px solid #ffb74d;
+  flex-shrink: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.ai-anim {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .ai-chatbot {
+    width: 92vw;
+    height: 420px;
+    right: 4vw;
+    bottom: 110px;
+    max-width: 92vw;
+    border-radius: 16px;
+    left: auto;
+  }
+  
+  .ai-chat-header {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+  
+  .ai-chat-msg {
+    max-width: 90%;
+  }
+  
+  .ai-chat-input {
+    padding: 10px;
+  }
+  
+  .ai-chat-input input {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+}
+
+/* === ESTILOS PARA CUADRO DE BIENVENIDA === */
+#welcome-dialog {
+  animation: fadeInWelcome 0.5s cubic-bezier(0.4, 2, 0.6, 1);
+}
+
+#close-welcome {
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+#close-welcome:hover {
+  transform: scale(1.2) rotate(90deg);
+  color: #ff6f61 !important;
+}
+
+#close-welcome:active {
+  transform: scale(0.95) rotate(90deg);
+}
+
+/* Permite click en el overlay para cerrar */
+#welcome-dialog::backdrop {
+  cursor: pointer;
+}
+
+@keyframes fadeInWelcome {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==================== DATE PICKER STYLES ==================== */
+
+.date-picker-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-picker-container input[type="date"],
+.date-picker-container-expiry input[type="date"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #43cea2;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, #fff9e6 0%, #fffbe6 100%);
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.date-picker-container input[type="date"][readonly],
+.date-picker-container-expiry input[type="date"][readonly] {
+  background: linear-gradient(135deg, #f0f8f6 0%, #e8f6f3 100%);
+  color: #1a7366;
+  cursor: not-allowed;
+}
+
+.date-picker-container input[type="date"]:hover,
+.date-picker-container-expiry input[type="date"]:hover {
+  border-color: #2db88f;
+  box-shadow: 0 4px 12px rgba(67, 206, 162, 0.2);
+}
+
+.date-picker-container input[type="date"]:focus,
+.date-picker-container-expiry input[type="date"]:focus {
+  outline: none;
+  border-color: #1ea77a;
+  box-shadow: 0 0 0 3px rgba(67, 206, 162, 0.15);
+  background: #fffce6;
+}
+
+.date-picker-container input[type="date"]::-webkit-calendar-picker-indicator,
+.date-picker-container-expiry input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.date-picker-container input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.date-picker-container-expiry input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.date-picker-container-expiry {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-picker-icon {
+  font-size: 1.3rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.date-picker-icon:hover {
+  background: rgba(67, 206, 162, 0.1);
+  transform: scale(1.15);
+}
+
+/* ==================== GLOBAL BACKGROUND + UX IMPROVEMENTS ==================== */
+:root {
+  --app-bg-gradient: linear-gradient(180deg, #f6f8fb 0%, #eef6fc 40%, #f7fbff 100%);
+  --app-bg-overlay: rgba(255,255,255,0.55);
+  --app-accent: #667eea;
+}
+
+html, body {
+  height: 100%;
+  background: var(--app-bg-gradient) fixed no-repeat;
+  background-size: cover;
+  color: #1c2530;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* subtle texture using radial-gradient to avoid extra assets */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.6;
+  mix-blend-mode: overlay;
+  z-index: 0;
+}
+
+/* Keep app content above the texture */
+#page, .main-header, .main-sections, #floating-buttons-wrapper, .app-toast, .modal-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Header contrast and soft glass effect */
+.main-header {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(6px) saturate(120%);
+  border-bottom: 1px solid rgba(25, 39, 58, 0.06);
+}
+
+/* Defensive: make header more opaque to avoid underlying texture washing out navbar labels */
+.main-header {
+  background-color: rgba(255,255,255,0.95) !important;
+}
+
+/* Ensure navbar sits above decorative overlay and labels contrast */
+.navbar-menu { position: relative; z-index: 2; }
+.navbar-menu .navbar-link span { color: #061021 !important; text-shadow: 0 1px 0 rgba(255,255,255,0.06) !important; }
+
+/* In AI enhanced mode keep dark labels to contrast bright accent header */
+body.ai-enhanced .navbar-menu .navbar-link span { color: #181c2b !important; }
+
+/* Floating buttons visibility */
+#floating-buttons-wrapper .fab-btn, #floating-buttons-wrapper a.fab-btn {
+  box-shadow: 0 12px 36px rgba(51,65,85,0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+#floating-buttons-wrapper .fab-btn:hover, #floating-buttons-wrapper a.fab-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 18px 46px rgba(51,65,85,0.16);
+}
+
+/* Modal refinements for readability */
+.modal-content {
+  background: rgba(255,255,255,0.98);
+  border-radius: 12px;
+  box-shadow: 0 24px 56px rgba(15,23,42,0.12);
+}
+
+/* Toast improvements */
+.app-toast {
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(15,23,42,0.12);
+  backdrop-filter: blur(4px);
+}
+
+/* Ensure fixed elements overlay correctly when dialogs open */
+.blocking-dialog-active .main-header, .blocking-dialog-active #floating-buttons-wrapper {
+  display: none !important;
+}
+
+/* small responsive tweak */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Strong final override: ensure navbar labels are always visible and readable
+   (fixes cases where other themes/overlays set low opacity or blend modes) */
+.navbar-menu .navbar-link span{
+  display: inline-block !important;
+  color: #0b1220 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  mix-blend-mode: normal !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.06) !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Keep the same high-contrast color in AI-enhanced mode */
+body.ai-enhanced .navbar-menu .navbar-link span{
+  color: #0b1220 !important;
+}

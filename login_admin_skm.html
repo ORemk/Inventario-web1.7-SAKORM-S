@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ingreso Administrador — SAKORM'S Inventory</title>
+    <base id="site-base" href="/Sakorms.org/Inventory-web1.5/">
+    <script>
+      (function(){
+        try{
+          var be = document.getElementById('site-base');
+          if (!be) return;
+          var p = location.pathname || '/';
+          var parts = p.split('/').filter(function(x){ return !!x; });
+          if (parts.length && parts[parts.length-1].indexOf('.') !== -1) parts.pop();
+          var basePath = '/' + parts.join('/') + (parts.length ? '/' : '');
+          // Only override the default base when we detect the project folder in the path
+          if (basePath.indexOf('/Inventory-web1.5') !== -1) {
+            be.setAttribute('href', basePath);
+            console.info('Base href ajustada dinámicamente a', basePath);
+          } else {
+            console.info('Base href not changed (kept default):', be.getAttribute('href'));
+          }
+        } catch(e) { console.warn('base resolve failed', e); }
+      })();
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+      :root{
+        --bg:#0f1724; --card:#0b1220; --accent:#6c5ce7; --accent-2:#00d4ff;
+        --muted:#9aa4b2; --input-bg:#071226; --neon: #43f0ff;
+      }
+      *{box-sizing:border-box}
+      body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,var(--bg) 0%, #071029 100%);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center}
+      .wrap{width:100%;max-width:1100px;padding:28px;display:grid;grid-template-columns:420px 1fr;gap:28px;align-items:start}
+      .brand{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:28px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.12));box-shadow:0 12px 50px rgba(2,6,23,0.6);position:relative;overflow:hidden}
+      /* Neon border accent */
+      .brand::after{content:'';position:absolute;inset:0;border-radius:18px;padding:2px;background:linear-gradient(90deg,transparent,rgba(108,92,231,0.12),rgba(0,212,255,0.08));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);pointer-events:none}
+      .logo{width:84px;height:84px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;margin-bottom:16px;box-shadow:0 8px 30px rgba(108,92,231,0.18)}
+      .brand h1{margin:0;font-size:1.6rem;line-height:1.05;color:#fff}
+      .brand p{margin:8px 0 0 0;color:var(--muted);max-width:320px}
+      .card{background:linear-gradient(180deg,var(--card),rgba(10,12,20,0.6));padding:28px;border-radius:16px;box-shadow:0 18px 70px rgba(2,6,23,0.7);transform:translateY(0);transition:transform .35s cubic-bezier(.2,.9,.2,1),box-shadow .25s}
+      .card:hover{transform:translateY(-6px);box-shadow:0 28px 90px rgba(2,6,23,0.85)}
+      .card.animate-in{animation:cardIn .6s cubic-bezier(.2,.9,.2,1) both}
+      @keyframes cardIn{from{transform:translateY(18px) scale(.995);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+      form{display:flex;flex-direction:column;gap:14px;min-width:320px}
+      label{font-size:0.95rem;color:var(--muted);display:block;margin-bottom:6px;font-weight:600}
+      input[type=text],input[type=email],input[type=password],input[type=date],input[readonly]{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04));border:1px solid rgba(255,255,255,0.04);padding:14px 16px;border-radius:12px;color:#eaf4ff;font-size:1.02rem;transition:box-shadow .18s,transform .12s}
+      input::placeholder{color:rgba(230,238,248,0.45)}
+      input:focus{outline:none;box-shadow:0 6px 24px rgba(108,92,231,0.12), 0 0 12px rgba(67,240,255,0.06) inset}
+      .row{display:flex;gap:12px;align-items:center}
+      .remember{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:0.92rem}
+      .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;padding:12px 18px;border-radius:12px;color:#061021;font-weight:700;font-size:1rem;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+      .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(108,92,231,0.18)}
+      .btn-primary[disabled]{opacity:.7;cursor:not-allowed;transform:none}
+      .muted{color:var(--muted);font-size:0.92rem}
+      .helper{font-size:0.86rem;color:var(--muted);margin-top:8px}
+      .footer-links{display:flex;gap:12px;margin-top:14px}
+      .link{color:var(--accent-2);text-decoration:none;font-weight:600}
+      .input-with-toggle{display:flex;align-items:center;gap:8px}
+      .input-with-toggle input{flex:1}
+      .toggle-pass{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px;font-size:1.05rem}
+      .toggle-pass:hover{color:#fff}
+      .neon-line{height:2px;background:linear-gradient(90deg,var(--accent) 0%, var(--neon) 50%, var(--accent-2) 100%);box-shadow:0 6px 18px rgba(67,240,255,0.08);border-radius:2px;margin:10px 0}
+      .neon-line-strong{height:3px;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--neon),var(--accent-2));box-shadow:0 6px 30px rgba(108,92,231,0.12),0 0 24px rgba(67,240,255,0.06);margin:12px 0 18px 0}
+      .dialog-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;z-index:12000;opacity:0;pointer-events:none;transition:opacity .18s}
+      .dialog-backdrop.active{opacity:1;pointer-events:auto}
+      /* Toast notifications */
+      .toast-container{position:fixed;top:20px;right:20px;z-index:13000;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+      .toast{min-width:220px;max-width:360px;padding:10px 14px;border-radius:10px;color:#071021;background:rgba(255,255,255,0.95);box-shadow:0 8px 30px rgba(2,6,23,0.45);font-weight:700;opacity:0;transform:translateY(-6px);transition:opacity .18s,transform .18s}
+      .toast.show{opacity:1;transform:translateY(0)}
+      .toast.success{background:linear-gradient(90deg,#56d364,#25c06b);color:#041016}
+      .toast.error{background:linear-gradient(90deg,#ff6b6b,#ff4c4c);color:#fff}
+      .toast.info{background:linear-gradient(90deg,#6c5ce7,#00d4ff);color:#031021}
+      .dialog{background:linear-gradient(180deg,#071026, #0b1220);padding:18px;border-radius:12px;min-width:320px;color:#fff;box-shadow:0 18px 60px rgba(2,6,23,0.8);transform:translateY(8px);transition:transform .18s,opacity .18s}
+      .dialog-enter{animation:dialogIn .28s cubic-bezier(.2,.9,.2,1) both}
+      @keyframes dialogIn{from{transform:translateY(18px) scale(.98);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+      .dialog-backdrop{backdrop-filter:blur(4px);transition:opacity .18s,background .2s}
+      .btn-primary{transition:transform .12s ease, box-shadow .12s ease, background .18s}
+      .btn-primary:active{transform:translateY(1px) scale(.998)}
+      .btn-primary:focus{outline:2px solid rgba(108,92,231,0.18);outline-offset:3px}
+      .input-with-toggle input{transition:box-shadow .12s, border-color .12s}
+      /* subtle floating when hero logo mounts */
+      .logo-float { animation:floaty 6s ease-in-out infinite; }
+      @keyframes floaty { 0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)} }
+      .dialog h3{margin:0 0 8px 0}
+      .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,0.12);border-top-color:#fff;border-radius:50%;animation:spin .9s linear infinite;vertical-align:middle;margin-left:8px}
+      @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+      @media(max-width:880px){.wrap{grid-template-columns:1fr;padding:20px}.brand{order:2}}
+      /* Defensive fixes: ensure logo/image visibility and hide stray welcome overlays */
+      #welcome-dialog, .welcome-dialog, .welcome-overlay { display: none !important; pointer-events: none !important; opacity: 0 !important; }
+      .logo, .brand, .card, #admin-login-form { position: relative; z-index: 5; }
+      img, svg { max-width: 100%; height: auto; display: block; position: relative; z-index: 6; }
+      input[type=text], input[type=password], input[type=email] { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)); border:1px solid rgba(255,255,255,0.06); color: #eaf4ff; }
+    </style>
+  </head>
+  <body>
+    <main style="width:100%;max-width:1100px;">
+      <div class="wrap">
+        <aside class="brand">
+          <div class="logo"><i class="fas fa-cubes"></i></div>
+          <h1>SAKORM'S Inventory</h1>
+          <p>Panel exclusivo para administradores del sistema. Aquí puedes generar claves, gestionar clientes y acceder a funciones avanzadas sin restricciones.</p>
+          <div style="margin-top:18px;color:var(--muted);font-size:0.9rem">Acceso seguro — mantén tu token secreto y la contraseña protegida.</div>
+        </aside>
+        <section class="card">
+          <h2 style="margin:0 0 8px 0;color:#fff">Ingresar como Administrador</h2>
+          <div class="neon-line-strong" aria-hidden="true"></div>
+          <!-- Registro de CF moved next to Registrar administrador button -->
+          <p class="helper">Usa tu usuario o correo y contraseña de administrador para acceder al panel.</p>
+          <div id="login-form">
+          <form id="admin-login-form" autocomplete="off">
+            <div>
+              <label for="email">Usuario</label>
+              <input type="text" id="email" placeholder="Ingresa tu usuario o correo" required>
+              <label for="password">Contraseña</label>
+              <div class="input-with-toggle">
+                <input type="password" id="password" placeholder="Contraseña segura" required>
+                <button type="button" class="toggle-pass" data-target="password" aria-label="Mostrar contraseña">👁</button>
+              </div>
+            </div>
+            <!-- Campos opcionales eliminados por petición: usuario, teléfono, nombres, apellidos, fecha/hora -->
+            <div class="row">
+              <label class="remember"><input type="checkbox" id="remember"> Recordarme</label>
+              <div style="flex:1"></div>
+              <a class="link" href="#" id="link-recuperar">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div>
+              <button type="submit" class="btn-primary">Entrar como Administrador</button>
+            </div>
+            <div id="login-error" class="muted" style="display:none;margin-top:6px"></div>
+            <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <!-- Button that becomes visible only after master verification -->
+              <button type="button" id="show-register" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);display:inline-block;">Registrar administrador</button>
+              <button type="button" id="registro-cf" class="btn-primary" role="link" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;display:inline-block;">Registro de CF</button>
+              <span id="show-register-note" class="muted" style="margin-left:8px;display:inline-block;font-size:0.92rem"></span>
+            </div>
+          </form>
+          </div>
+          <!-- Formulario de registro de administrador (oculto por defecto) -->
+          <form id="register-form" style="display:none;margin-top:12px;">
+            <div id="verified-banner" style="display:none;margin-bottom:10px;padding:10px;border-radius:8px;background:linear-gradient(90deg,#061026, #07142a);color:#9fe8ff;display:flex;align-items:center;justify-content:space-between;">
+              <div>Verificación master válida durante: <strong id="verified-countdown">05:00</strong></div>
+              <div style="font-size:0.92rem;color:#9fb2c8">Si expira, deberás volver a verificar</div>
+            </div>
+            <h3 style="margin:0 0 8px 0;color:#fff;font-size:1.05rem">Registrar nuevo administrador</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:start;margin-bottom:8px">
+              <div style="grid-column:1/span1">
+                <label for="reg-nombres">Nombre(s)</label>
+                <input type="text" id="reg-nombres" placeholder="Nombre(s)" required>
+              </div>
+              <div style="grid-column:2/span1">
+                <label for="reg-apellido-paterno">Apellido paterno</label>
+                <input type="text" id="reg-apellido-paterno" placeholder="Apellido paterno" required>
+              </div>
+              <div style="grid-column:3/span1">
+                <label for="reg-apellido-materno">Apellido materno</label>
+                <input type="text" id="reg-apellido-materno" placeholder="Apellido materno">
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+              <div style="flex:1;min-width:220px">
+                <label for="reg-admin-id">ID Administrador</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input type="text" id="reg-admin-id" readonly style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.06);padding:12px;border-radius:10px;color:#cfe6ff;font-weight:600">
+                  <button type="button" id="reg-admin-id-generate" class="btn-primary" style="padding:8px 12px">Generar</button>
+                  <button type="button" id="reg-admin-id-copy" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.06);">Copiar</button>
+                </div>
+                <div class="muted" style="margin-top:6px;font-size:0.85rem">ID determinístico (basado en los datos ingresados y marca de tiempo)</div>
+              </div>
+              <div style="width:320px;min-width:220px">
+                <label for="reg-datetime-display">Fecha y hora (actual)</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input type="text" id="reg-datetime-display" readonly style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.06);padding:12px;border-radius:10px;color:#cfe6ff;font-weight:600">
+                </div>
+                <input type="hidden" id="reg-datetime" aria-hidden="true">
+              </div>
+            </div>
+            <div style="margin-bottom:8px">
+              <label for="reg-username">ID Administrador (usuario)</label>
+              <input type="text" id="reg-username" placeholder="usuario" required>
+            </div>
+            <div style="margin-bottom:8px">
+              <label for="reg-email">Usuario o correo</label>
+              <input type="text" id="reg-email" placeholder="Ingresa usuario o correo">
+            </div>
+            <div style="margin-bottom:8px">
+              <label for="reg-phone">Teléfono</label>
+              <input type="text" id="reg-phone" placeholder="5512345678">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin-bottom:8px">
+              <div>
+                <label for="reg-password">Contraseña</label>
+                <div class="input-with-toggle">
+                  <input type="password" id="reg-password" placeholder="Contraseña segura" required>
+                  <button type="button" class="toggle-pass" data-target="reg-password" aria-label="Mostrar contraseña">👁</button>
+                </div>
+              </div>
+              <div>
+                <label for="reg-password-confirm">Confirmar contraseña</label>
+                <div class="input-with-toggle">
+                  <input type="password" id="reg-password-confirm" placeholder="Repite la contraseña" required>
+                  <button type="button" class="toggle-pass" data-target="reg-password-confirm" aria-label="Mostrar contraseña">👁</button>
+                </div>
+              </div>
+            </div>
+            <!-- duplicated password inputs removed -->
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button type="submit" id="register-submit" class="btn-primary">Crear administrador</button>
+              <button type="button" id="cancel-register" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);">Cancelar</button>
+            </div>
+            <div id="register-error" class="muted" style="display:none;margin-top:6px" role="alert" aria-live="assertive"></div>
+            <div id="register-status" class="muted" style="display:none;margin-top:6px" role="status" aria-live="polite"></div>
+              <div id="login-fallback" class="muted" style="display:none;margin-top:8px">Si la sesión no inició automáticamente, <a href="#" id="fallback-login-link">inicia sesión aquí</a>.</div>
+            </form>
+
+            <!-- Formulario de registro de Cliente Final (oculto por defecto) -->
+            <form id="client-register-form" style="display:none;margin-top:12px;">
+              <h3 style="margin:0 0 8px 0;color:#fff;font-size:1.05rem">Registrar Cliente Final</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-first-name">Nombre(s)</label>
+                  <input type="text" id="client-first-name" placeholder="Nombre(s)" required>
+                </div>
+                <div>
+                  <label for="client-company">Empresa (opcional)</label>
+                  <input type="text" id="client-company" placeholder="Empresa">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-lastname-p">Apellido paterno</label>
+                  <input type="text" id="client-lastname-p" placeholder="Apellido paterno">
+                </div>
+                <div>
+                  <label for="client-lastname-m">Apellido materno</label>
+                  <input type="text" id="client-lastname-m" placeholder="Apellido materno">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-email">Correo electrónico</label>
+                  <input type="email" id="client-email" placeholder="correo@ejemplo.com">
+                </div>
+                <div>
+                  <label for="client-phone">Teléfono</label>
+                  <input type="text" id="client-phone" placeholder="5512345678">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-tax">RFC / Tax ID</label>
+                  <input type="text" id="client-tax" placeholder="RFC o identificación fiscal">
+                </div>
+                <div>
+                  <label for="client-contact">Persona de contacto</label>
+                  <input type="text" id="client-contact" placeholder="Nombre del contacto">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-address">Dirección</label>
+                  <input type="text" id="client-address" placeholder="Calle, número, colonia">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <input type="text" id="client-city" placeholder="Ciudad">
+                  <input type="text" id="client-state" placeholder="Estado / Provincia">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-postal">Código postal</label>
+                  <input type="text" id="client-postal" placeholder="CP">
+                </div>
+                <div>
+                  <label for="client-country">País</label>
+                  <input type="text" id="client-country" placeholder="País">
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+                <div>
+                  <label for="client-website">Sitio web</label>
+                  <input type="text" id="client-website" placeholder="https://ejemplo.com">
+                </div>
+                <div>
+                  <label for="client-notes">Notas / Comentarios</label>
+                  <input type="text" id="client-notes" placeholder="Observaciones internas (opcional)">
+                </div>
+              </div>
+              <div style="margin-bottom:8px">
+                <label for="client-access-key">Clave de acceso (si la tiene)</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input type="text" id="client-access-key" placeholder="Clave de acceso entregada por el administrador" style="flex:1">
+                  <button type="button" id="client-validate-key" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);padding:8px 12px">Validar</button>
+                </div>
+                <div class="muted" style="margin-top:6px;font-size:0.85rem">Si entregaste una clave, introdúcela para activarla en el registro.</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+                <button type="button" id="client-register-submit" class="btn-primary">Registrar Cliente</button>
+                <button type="button" id="client-register-cancel" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);">Cancelar</button>
+                <button type="button" id="admin-gen-key-unassigned" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);">Generar clave para cliente</button>
+              </div>
+              <div id="client-register-status" class="muted" style="display:none;margin-top:6px" role="status"></div>
+            </form>
+
+            <!-- Formulario de recuperación (oculto por defecto) -->
+          <form id="recover-form" style="display:none;margin-top:12px;">
+            <h3 style="margin:0 0 8px 0;color:#fff;font-size:1.05rem">Recuperar contraseña</h3>
+            <div style="margin-bottom:8px">
+              <label for="rec-email">Correo electrónico o usuario</label>
+              <input type="text" id="rec-email" placeholder="Ingresa tu usuario o correo" required>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button type="submit" class="btn-primary">Enviar instrucciones</button>
+              <button type="button" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.04);" data-onclick="mostrarLogin()">Volver</button>
+            </div>
+            <div id="recover-error" class="muted" style="display:none;margin-top:6px" role="alert"></div>
+          </form>
+        </section>
+      </div>
+    </main>
+    <!-- Modal estático para diálogos (evita creación dinámica por ui.js) -->
+    <div id="modal-dialogo" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:120000;">
+      <div class="modal-content" style="position:relative;max-width:720px;width:calc(100% - 40px);background:#071026;border-radius:12px;padding:18px;color:#eaf4ff;box-shadow:0 18px 56px rgba(0,0,0,0.28);">
+        <span id="modal-dialogo-icono" style="display:inline-block;margin-right:8px;font-size:20px;">ℹ️</span>
+        <h2 id="modal-dialogo-titulo" style="display:inline-block;margin:0;font-size:1.1rem;vertical-align:middle"></h2>
+        <div id="modal-dialogo-mensaje" style="margin-top:12px;line-height:1.4;color:inherit"></div>
+        <div id="modal-dialogo-input-container" style="display:none;margin-top:10px;"><input id="modal-dialogo-input" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06)"/></div>
+        <div id="modal-dialogo-botones" style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;"></div>
+        <button id="cerrar-modal-dialogo" aria-label="Cerrar diálogo" style="position:absolute;top:10px;right:10px;background:#0b1220;border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:6px 8px;cursor:pointer;color:#fff">&times;</button>
+      </div>
+    </div>
+
+    <script src="/Sakorms.org/Inventory-web1.5/js/config.js?t=20260130000000"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/ui.js?t=20260130000000"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/auth.js?t=20260129000000"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/login.js?t=20260130000000"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/inline-handler-polyfill.js"></script>
+    <script>
+      // Defensive DOM helpers for inline scripts
+      function $id(id) { try { return document.getElementById(id); } catch(e) { return null; } }
+      function $val(id, fallback = '') { try { const el = document.getElementById(id); return (el && typeof el.value !== 'undefined') ? el.value : fallback; } catch(e) { return fallback; } }
+      function $trimVal(id, fallback = '') { try { const v = $val(id, fallback); return (typeof v === 'string') ? v.trim() : String(v); } catch(e) { return fallback; } }
+
+      // Improve UX: focus email, disable submit while request in flight
+      async function handleAdminLogin(e) {
+        e.preventDefault();
+        const form = document.getElementById('admin-login-form');
+        const submitBtn = form.querySelector('button[type=submit]');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.dataset.orig = submitBtn.textContent; submitBtn.textContent = 'Validando...'; }
+        // show modal dialog while validating
+        try { showDialog('Validando credenciales...'); } catch(e){}
+        try {
+          // llamar a la función existente validarLogin (async)
+          if (typeof validarLogin === 'function') {
+            await validarLogin(e);
+          } else {
+            // fallback: submit normally
+            form.submit();
+          }
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtn.dataset.orig || 'Entrar como Administrador'; }
+          try { hideDialog(); } catch(e){}
+        }
+        return false;
+      }
+
+      // autofocus for accessibility
+      (function(){
+        try {
+          const email = document.getElementById('email');
+          // Only focus if nothing else is focused to avoid browser blocking warnings
+          const active = document.activeElement;
+          const activeTag = active && active.tagName ? active.tagName.toLowerCase() : null;
+          if (email && (!active || active === document.body || activeTag === 'html')) {
+            email.focus();
+            email.select && email.select();
+          }
+        } catch(e){}
+      })();
+
+      // Check session to determine if current user is superadmin; mark button to require master auth otherwise
+      (async function(){
+        try {
+          const loginAdminUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/admin/login_admin.php') : (document.baseURI ? new URL('api/admin/login_admin.php', document.baseURI).href : 'api/admin/login_admin.php');
+          const resp = await fetch(loginAdminUrl, { method: 'GET', credentials: 'same-origin' });
+          const j = await resp.json().catch(()=>({}));
+          const btn = document.getElementById('show-register');
+          const reg = document.getElementById('register-form');
+          const note = document.getElementById('show-register-note');
+          // if current session is superadmin, allow direct access; otherwise require master auth on click
+          if (!j.success || !j.user || parseInt(j.user.is_superadmin || 0) !== 1) {
+            // require master auth: keep register button visible but protected
+            if (btn) { btn.style.display = 'inline-block'; btn.dataset.requiresMaster = '1'; }
+            if (reg) reg.style.display = 'none';
+            if (note) note.textContent = 'Requiere verificación master';
+          } else {
+            // already superadmin: show register button directly
+            if (btn) { btn.style.display = 'inline-block'; btn.dataset.requiresMaster = '0'; }
+            if (note) note.textContent = '';
+          }
+        } catch(e) { console.debug('session check failed', e); }
+      })();
+
+      // Toggle register form (robust: guarded and uses event listener)
+      (function(){
+        // Prevent attaching this inline handler if another handler (e.g. from login.js)
+        // already attached a toggle. This avoids double-toggle (open then close).
+        if (window.__registerToggleAttached) return;
+        const btn = document.getElementById('show-register');
+        const form = document.getElementById('register-form');
+        if (!btn || !form) return;
+        // show-register triggers the master auth modal before allowing access
+
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          try {
+            // Always require master authorization before showing registration form
+            const modal = document.getElementById('master-auth-modal');
+            if (modal) {
+              modal.dataset.mode = 'master';
+              modal.classList.add('active');
+              return;
+            }
+            // fallback: open dedicated registration page
+            const target = (document.baseURI ? new URL('admin/register_admin.php', document.baseURI).href : (window.buildAppUrl ? window.buildAppUrl('admin/register_admin.php') : '/Sakorms.org/Inventory-web1.5/admin/register_admin.php'));
+            try { window.location.href = target; } catch(e) { window.location = target; }
+          } catch (err) {
+            console.error('open master auth or redirect failed', err);
+          }
+        });
+        // mark as attached to avoid duplicate handlers
+        window.__registerToggleAttached = true;
+      })();
+      // cancel-register handler (guarded)
+      (function(){
+        const cancelBtn = document.getElementById('cancel-register');
+        const regForm = document.getElementById('register-form');
+        if (!cancelBtn) return;
+        cancelBtn.addEventListener('click', function(){
+          try { console.debug('[login_admin_skm] cancel-register clicked'); } catch(e){}
+          if (typeof switchForm === 'function') {
+            try { switchForm('login-form'); } catch(e) { if (regForm) regForm.style.display = 'none'; }
+          } else {
+            if (regForm) regForm.style.display = 'none';
+          }
+          // clear live datetime interval if set
+          const dtEl = document.getElementById('reg-datetime');
+          if (dtEl && dtEl._interval) { clearInterval(dtEl._interval); dtEl._interval = null; }
+        });
+      })();
+
+        async function registerAdmin(e){
+        e && e.preventDefault();
+        const submitBtn = document.getElementById('register-submit');
+        const nombres = $trimVal('reg-nombres');
+        const apellidoP = $trimVal('reg-apellido-paterno');
+        const apellidoM = $trimVal('reg-apellido-materno');
+        const username = $trimVal('reg-username');
+        const email = $trimVal('reg-email');
+          const password = $val('reg-password', '');
+          const passwordConfirm = $val('reg-password-confirm', '');
+        const errEl = document.getElementById('register-error');
+        const statusEl = document.getElementById('register-status');
+        if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+        if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+
+        // Basic checks: password required + at least 3 identifying fields non-empty
+        const phone = $trimVal('reg-phone');
+        const ident = [username, nombres, apellidoP, apellidoM, email, phone];
+        const nonEmpty = ident.filter(v => v && v.length>0).length;
+        if (!password || nonEmpty < 3) {
+          if (errEl) { errEl.style.display = 'block'; errEl.textContent = 'Se requiere contraseña y al menos 3 campos entre nombre, apellidos, usuario, correo o teléfono.'; }
+          return;
+        }
+          // Password match
+          if (password !== passwordConfirm) {
+            if (errEl) { errEl.style.display = 'block'; errEl.textContent = 'Las contraseñas no coinciden.'; }
+            return;
+          }
+          // no phone field in this layout
+
+        // disable submit while processing
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.dataset.orig = submitBtn.textContent; submitBtn.textContent = 'Creando...'; }
+        try{
+          showDialog('Creando administrador...');
+          // ensure admin id and datetime
+          const regDatetimeEl = document.getElementById('reg-datetime');
+          const adminIdEl = document.getElementById('reg-admin-id');
+            const regDatetime = (regDatetimeEl && regDatetimeEl.value) || new Date().toISOString();
+          let adminId = (adminIdEl && adminIdEl.value) || '';
+          if (!adminId) {
+            // generate deterministic id from supplied data + timestamp
+            const input = [nombres, apellidoP, apellidoM, username, email, regDatetime].join('|');
+            adminId = await generateIdFromString(input, 25);
+            if (adminIdEl) adminIdEl.value = adminId;
+          }
+
+          const fullName = [nombres, apellidoP, apellidoM].filter(Boolean).join(' ').trim();
+          const payload = { 
+            nombre: fullName || username,
+            apellido_paterno: apellidoP,
+            apellido_materno: apellidoM,
+            username: username,
+            email: email,
+            phone: phone,
+            admin_id: adminId,
+            registered_at: regDatetime,
+            password: password
+          };
+          const apiUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/admin/register_admin.php') : (document.baseURI ? new URL('api/admin/register_admin.php', document.baseURI).href : 'api/admin/register_admin.php');
+          const resp = await fetch(apiUrl, {
+            method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload)
+          });
+          const j = await resp.json().catch(()=>({}));
+          // expose the raw response to automated tests (non-intrusive)
+          try { window.__LAST_REGISTER_RESPONSE = j; } catch(e) { /* ignore */ }
+          if (!resp.ok || !j.success) {
+            const m = j.error || j.message || 'Error al crear administrador';
+            if (errEl) { errEl.style.display = 'block'; errEl.textContent = m; }
+            try { showToast(m, 'error'); } catch(e){}
+            return;
+          }
+          // Success: if API returned a redirect URL, follow it. Otherwise try auto-login as fallback.
+          if (j.redirect) {
+            try {
+              // If running under automation (webdriver), delay redirect slightly so test harness can read window.__LAST_REGISTER_RESPONSE
+              if (typeof navigator !== 'undefined' && navigator.webdriver) {
+                setTimeout(function(){ try { redirectTo(j.redirect); } catch(e) { window.location.href = j.redirect; } }, 200);
+                return;
+              }
+              redirectTo(j.redirect);
+              return;
+            } catch(e) { window.location.href = j.redirect; return; }
+          }
+            try {
+            const loginUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/admin/login_admin.php') : (document.baseURI ? new URL('api/admin/login_admin.php', document.baseURI).href : 'api/admin/login_admin.php');
+            const loginResp = await fetch(loginUrl, {
+              method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ email: email, password: password })
+            });
+            const lj = await loginResp.json().catch(()=>({}));
+            if (loginResp.ok && lj.success) {
+              redirectTo('index.html');
+              return;
+            }
+          } catch (le) {
+            // ignore and continue
+          }
+
+          // show success status and fallback
+          if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = 'Administrador creado correctamente. Puedes iniciar sesión.'; }
+          try { showToast('Administrador creado correctamente', 'success'); } catch(e){}
+          const fallback = document.getElementById('login-fallback');
+          if (fallback) fallback.style.display = 'block';
+          // hide the visible register form (id: register-form)
+          const regFormEl = document.getElementById('register-form');
+          if (regFormEl) regFormEl.style.display = 'none';
+        } catch (err) {
+          console.error('register admin error', err);
+          if (errEl) { errEl.style.display = 'block'; errEl.textContent = 'Error de red al comunicarse con el servidor.'; }
+        } finally {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtn.dataset.orig || 'Crear administrador'; }
+          try { hideDialog(); } catch(e){}
+        }
+      }
+      // helper: generate short hex id from input string (uses SHA-256 when available)
+      async function generateIdFromString(str, length) {
+        try {
+          if (window.crypto && crypto.subtle) {
+            const enc = new TextEncoder();
+            const buf = await crypto.subtle.digest('SHA-256', enc.encode(str));
+            const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+            return hex.slice(0, length);
+          }
+        } catch (e) {
+          // fallthrough to fallback
+          console.warn('crypto.subtle unavailable, falling back to random id', e);
+        }
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let out = '';
+        for (let i=0;i<length;i++) out += chars.charAt(Math.floor(Math.random()*chars.length));
+        return out;
+      }
+
+      // Prepare register form: set datetime and pre-generate admin id
+      async function prepareRegisterForm() {
+        try { console.debug('[login_admin_skm] prepareRegisterForm called'); } catch(e){}
+        const dtEl = document.getElementById('reg-datetime');
+        const idEl = document.getElementById('reg-admin-id');
+        const nombresEl = document.getElementById('reg-nombres');
+        const apellidoPEl = document.getElementById('reg-apellido-paterno');
+        const usernameEl = document.getElementById('reg-username');
+        const emailEl = document.getElementById('reg-email');
+
+        function seedForNow() {
+          const now = new Date().toISOString();
+          const nombres = (nombresEl && nombresEl.value) || '';
+          const apellidoP = (apellidoPEl && apellidoPEl.value) || '';
+          const username = (usernameEl && usernameEl.value) || '';
+          const email = (emailEl && emailEl.value) || '';
+          return [nombres, apellidoP, username, email, now].join('|');
+        }
+
+        // live datetime updater
+        if (dtEl) {
+          const displayEl = document.getElementById('reg-datetime-display');
+          const update = () => {
+            const now = new Date();
+            if (displayEl) displayEl.value = now.toLocaleString();
+            dtEl.value = now.toISOString();
+          };
+          update();
+          if (dtEl._interval) clearInterval(dtEl._interval);
+          dtEl._interval = setInterval(update, 1000);
+        }
+
+        // initial admin id
+        if (idEl) {
+          idEl.value = await generateIdFromString(seedForNow(), 25);
+          try { console.debug('[login_admin_skm] initial admin id set', idEl.value); } catch(e){}
+        }
+
+        // attach generate/copy handlers (idempotent)
+        const genBtn = document.getElementById('reg-admin-id-generate');
+        if (genBtn && !genBtn._bound) {
+          console.debug('[login_admin_skm] binding genBtn');
+          genBtn.addEventListener('click', async function(){
+            try { console.debug('[login_admin_skm] genBtn clicked'); } catch(e){}
+            const idv = await generateIdFromString(seedForNow(), 25);
+            const idEl2 = document.getElementById('reg-admin-id'); if (idEl2) idEl2.value = idv;
+          });
+          genBtn._bound = true;
+        }
+        const copyBtn = document.getElementById('reg-admin-id-copy');
+        if (copyBtn && !copyBtn._bound) {
+          console.debug('[login_admin_skm] binding copyBtn');
+          copyBtn.addEventListener('click', function(){
+            try { console.debug('[login_admin_skm] copyBtn clicked'); } catch(e){}
+            const idv = $val('reg-admin-id', '');
+            if (!idv) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(idv).catch(()=>{});
+            } else {
+              try { window.prompt('Copiar ID (Ctrl+C + Enter):', idv); } catch(e){}
+            }
+          });
+          copyBtn._bound = true;
+        }
+
+        // regenerate admin id when key fields change
+        const inputsToWatch = [nombresEl, apellidoPEl, usernameEl, emailEl];
+        inputsToWatch.forEach(inp => {
+          if (!inp) return;
+          if (inp._idWatcherBound) return;
+          inp.addEventListener('input', async function(){
+            const idEl2 = document.getElementById('reg-admin-id');
+            if (!idEl2) return;
+            idEl2.value = await generateIdFromString(seedForNow(), 25);
+          });
+          inp._idWatcherBound = true;
+        });
+      }
+
+      window.registerAdmin = registerAdmin;
+
+      // Attach form listeners and small helpers (safe idempotent attachment)
+      (function(){
+        try {
+          const loginForm = document.getElementById('admin-login-form');
+          if (loginForm && !loginForm._bound) { loginForm.addEventListener('submit', function(e){ e.preventDefault(); console.debug('[login_admin_skm] admin-login-form submit'); try { return handleAdminLogin(e); } catch(err){ console.error('handleAdminLogin missing',err); loginForm.submit(); } }); loginForm._bound = true; }
+
+          const regForm = document.getElementById('register-form');
+          if (regForm && !regForm._bound) { regForm.addEventListener('submit', function(e){ e.preventDefault(); console.debug('[login_admin_skm] register-form submit'); try { return registerAdmin(e); } catch(err){ console.error('registerAdmin missing',err); regForm.submit(); } }); regForm._bound = true; }
+
+          const recoverForm = document.getElementById('recover-form');
+          if (recoverForm && !recoverForm._bound) { recoverForm.addEventListener('submit', function(e){ e.preventDefault(); console.debug('[login_admin_skm] recover-form submit'); try { return recuperarCuenta(e); } catch(err){ console.error('recuperarCuenta missing',err); recoverForm.submit(); } }); recoverForm._bound = true; }
+
+          const recLink = document.getElementById('link-recuperar');
+          if (recLink && !recLink._bound) { recLink.addEventListener('click', function(e){ e.preventDefault(); console.debug('[login_admin_skm] link-recuperar clicked'); try { mostrarRecuperar(); } catch(err){ console.error('mostrarRecuperar missing',err); } }); recLink._bound = true; }
+
+        } catch(e){ console.warn('attach-login-listeners failed', e); }
+      })();
+
+      // Fallback login link behaviour
+      const fallbackLink = document.getElementById('fallback-login-link');
+      if (fallbackLink) {
+        fallbackLink.addEventListener('click', function(e){
+          e.preventDefault();
+          const regForm = document.getElementById('register-form');
+          if (regForm) regForm.style.display = 'none';
+          const loginForm = document.getElementById('admin-login-form');
+          if (loginForm) loginForm.scrollIntoView({behavior:'smooth'});
+          const emailInput = document.getElementById('email'); if (emailInput) emailInput.focus();
+        });
+      }
+      
+      // Client registration handlers
+      (function(){
+        try {
+          const submitBtn = document.getElementById('client-register-submit');
+          const cancelBtn = document.getElementById('client-register-cancel');
+          const form = document.getElementById('client-register-form');
+          if (!submitBtn || !form) return;
+          if (!submitBtn._bound) {
+            submitBtn.addEventListener('click', async function(e){
+                try {
+                e.preventDefault();
+                const first = $trimVal('client-first-name');
+                const lastP = $trimVal('client-lastname-p');
+                const lastM = $trimVal('client-lastname-m');
+                const name = [first, lastP, lastM].filter(Boolean).join(' ');
+                const company = $trimVal('client-company');
+                const email = $trimVal('client-email');
+                const phone = $trimVal('client-phone');
+                const tax = $trimVal('client-tax');
+                const contact = $trimVal('client-contact');
+                const address = $trimVal('client-address');
+                const city = $trimVal('client-city');
+                const state = $trimVal('client-state');
+                const postal = $trimVal('client-postal');
+                const country = $trimVal('client-country');
+                const website = $trimVal('client-website');
+                const notes = $trimVal('client-notes');
+                const accessKey = $trimVal('client-access-key');
+                const statusEl = document.getElementById('client-register-status');
+                if (statusEl) { statusEl.style.display='none'; statusEl.textContent=''; }
+                // basic validation
+                if (!first || first.length < 2) { if (statusEl) { statusEl.style.display='block'; statusEl.textContent = 'Nombre(s) debe tener al menos 2 caracteres.'; } return; }
+                const emailRegex = /^\S+@\S+\.\S+$/;
+                if (email && !emailRegex.test(email)) { if (statusEl) { statusEl.style.display='block'; statusEl.textContent = 'Formato de correo inválido.'; } return; }
+                const phoneDigits = phone.replace(/[^0-9+]/g,'');
+                if (phone && (phoneDigits.length < 7 || phoneDigits.length > 15)) { if (statusEl) { statusEl.style.display='block'; statusEl.textContent = 'Teléfono inválido.'; } return; }
+                if (!email && !phone) { if (statusEl) { statusEl.style.display='block'; statusEl.textContent = 'Se requiere correo o teléfono.'; } return; }
+                submitBtn.disabled = true; submitBtn.dataset.orig = submitBtn.textContent; submitBtn.textContent = 'Registrando...';
+                showDialog('Registrando cliente...');
+                const payload = { name: name, company: company, contact_person: contact, tax_id: tax, email: email, phone: phone, address: address, city: city, state: state, postal: postal, country: country, website: website, notes: notes };
+                let apiUrl, resp;
+                if (accessKey) {
+                  payload.access_key = accessKey;
+                  // attach device id to help server enforce single-device sessions
+                  try {
+                    let deviceId = localStorage.getItem('client_device_id');
+                    if (!deviceId) { deviceId = 'd-' + Math.random().toString(36).slice(2,12); localStorage.setItem('client_device_id', deviceId); }
+                    payload.device_id = deviceId;
+                  } catch(e) { /* ignore */ }
+                  apiUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/register_client_with_key.php') : (document.baseURI ? new URL('api/register_client_with_key.php', document.baseURI).href : 'api/register_client_with_key.php');
+                  resp = await fetch(apiUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+                } else {
+                  apiUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/admin/register_client.php') : (document.baseURI ? new URL('api/admin/register_client.php', document.baseURI).href : 'api/admin/register_client.php');
+                  resp = await fetch(apiUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+                }
+                const j = await resp.json().catch(()=>({}));
+                if (!resp.ok || !j.success) {
+                  const m = j.message || j.error || 'Error al registrar cliente';
+                  if (statusEl) { statusEl.style.display='block'; statusEl.textContent = m; }
+                  try { showToast(m, 'error'); } catch(e){}
+                  return;
+                }
+                try { showToast('Cliente registrado correctamente', 'success'); } catch(e){}
+                if (statusEl) { statusEl.style.display='block'; statusEl.textContent = 'Cliente registrado correctamente.'; }
+                // hide client form after success
+                try { localStorage.setItem('client_first_name', first); localStorage.setItem('client_lastname_p', lastP); localStorage.setItem('client_lastname_m', lastM); } catch(e){}
+                form.style.display = 'none';
+              } catch(err) {
+                console.error('client register error', err);
+                const statusEl = document.getElementById('client-register-status'); if (statusEl) { statusEl.style.display='block'; statusEl.textContent = 'Error de red al registrar cliente.'; }
+              } finally {
+                submitBtn.disabled = false; submitBtn.textContent = submitBtn.dataset.orig || 'Registrar Cliente';
+                try { hideDialog(); } catch(e){}
+              }
+            });
+            submitBtn._bound = true;
+          }
+          if (cancelBtn && !cancelBtn._bound) {
+            cancelBtn.addEventListener('click', function(e){ e.preventDefault(); try { form.style.display = 'none'; } catch(e){} });
+            cancelBtn._bound = true;
+          }
+          // validate access key button
+          const validateBtn = document.getElementById('client-validate-key');
+          if (validateBtn && !validateBtn._bound) {
+            validateBtn.addEventListener('click', async function(e){
+              e.preventDefault();
+              const k = $trimVal('client-access-key');
+              const statusEl = document.getElementById('client-register-status'); if (statusEl) { statusEl.style.display='none'; statusEl.textContent=''; }
+              if (!k) { if (statusEl) { statusEl.style.display='block'; statusEl.textContent='Introduce la clave para validar.'; } return; }
+              showDialog('Validando clave...');
+              try {
+                const apiUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/validate_key.php') : (document.baseURI ? new URL('api/validate_key.php', document.baseURI).href : 'api/validate_key.php');
+                const resp = await fetch(apiUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ key: k }) });
+                const j = await resp.json().catch(()=>({}));
+                if (!resp.ok || !j.success) { const m = j.message || 'Clave inválida'; if (statusEl) { statusEl.style.display='block'; statusEl.textContent = m; } try { showToast(m,'error'); } catch(e){} return; }
+                // show expiry if present
+                const d = j.data || {};
+                const msg = 'Clave válida' + (d.expires_at ? (', expira: ' + d.expires_at) : '');
+                if (statusEl) { statusEl.style.display='block'; statusEl.textContent = msg; }
+                try { showToast(msg, 'success'); } catch(e){}
+              } catch(err) {
+                console.error('validate key error', err);
+                if (statusEl) { statusEl.style.display='block'; statusEl.textContent='Error validando clave'; }
+              } finally { try { hideDialog(); } catch(e){} }
+            });
+            validateBtn._bound = true;
+          }
+
+          // admin generate unassigned key
+          const genKeyBtn = document.getElementById('admin-gen-key-unassigned');
+          if (genKeyBtn && !genKeyBtn._bound) {
+            genKeyBtn.addEventListener('click', async function(e){
+              e.preventDefault();
+              try {
+                showDialog('Generando clave...');
+                const apiUrl = (typeof buildApiUrl === 'function') ? buildApiUrl('/api/admin/generate_key.php') : (document.baseURI ? new URL('api/admin/generate_key.php', document.baseURI).href : 'api/admin/generate_key.php');
+                const resp = await fetch(apiUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({}) });
+                const j = await resp.json().catch(()=>({}));
+                if (!resp.ok || !j.success) { const m = j.message || 'Error generando clave'; showToast(m,'error'); return; }
+                const key = j.key || '';
+                // show result in prompt/copy
+                try {
+                  await navigator.clipboard.writeText(key);
+                  showToast('Clave generada y copiada al portapapeles', 'success', 4200);
+                } catch(e) {
+                  // fallback: prompt
+                  window.prompt('Clave generada (copiar):', key);
+                }
+              } catch(err) { console.error('gen key error', err); showToast('Error generando clave','error'); }
+              finally { try { hideDialog(); } catch(e){} }
+            });
+            genKeyBtn._bound = true;
+          }
+        } catch(e){ console.warn('client register handlers failed', e); }
+      })();
+      
+      // Prepare client form: prefill from localStorage and attach light validation helpers
+      function prepareClientForm() {
+        try {
+          const form = document.getElementById('client-register-form');
+          if (!form) return;
+          // prefill from localStorage when available
+          try {
+            const first = localStorage.getItem('client_first_name') || '';
+            const lastP = localStorage.getItem('client_lastname_p') || '';
+            const lastM = localStorage.getItem('client_lastname_m') || '';
+            if (first && document.getElementById('client-first-name')) document.getElementById('client-first-name').value = first;
+            if (lastP && document.getElementById('client-lastname-p')) document.getElementById('client-lastname-p').value = lastP;
+            if (lastM && document.getElementById('client-lastname-m')) document.getElementById('client-lastname-m').value = lastM;
+          } catch(e){}
+
+          // attach oninput validation hints (idempotent)
+          const firstEl = document.getElementById('client-first-name');
+          const statusEl = document.getElementById('client-register-status');
+          function showFieldError(msg) { if (statusEl) { statusEl.style.display='block'; statusEl.textContent = msg; } }
+          function clearFieldError() { if (statusEl) { statusEl.style.display='none'; statusEl.textContent = ''; } }
+          if (firstEl && !firstEl._bound) {
+            firstEl.addEventListener('input', function(){ clearFieldError(); });
+            firstEl._bound = true;
+          }
+        } catch(e){ console.warn('prepareClientForm failed', e); }
+      }
+    </script>
+    <script>
+      // Registro de CF should open admin verification modal (allow normal admin)
+      (function(){
+        try {
+          const cf = document.getElementById('registro-cf');
+          if (!cf) return;
+          if (cf._bound) return;
+          cf.addEventListener('click', function(e){
+            e.preventDefault();
+            try {
+              const modal = document.getElementById('master-auth-modal');
+              if (modal) { modal.dataset.mode = 'admin'; modal.classList.add('active'); }
+            } catch(err){ console.warn('registro-cf click failed', err); }
+          });
+          cf._bound = true;
+        } catch(e){ console.warn('registro-cf bind failed', e); }
+      })();
+    </script>
+    <!-- show-register opens master modal when required -->
+      <!-- Master auth modal (asks for master admin credentials before allowing registration) -->
+      <div id="master-auth-modal" class="dialog-backdrop" aria-hidden="true">
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="master-auth-title" style="min-width:320px;">
+          <h3 id="master-auth-title">Verificar credenciales de administrador</h3>
+          <div style="margin-top:8px">
+            <p class="muted">Introduce las credenciales del administrador master para autorizar el registro de un nuevo administrador.</p>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;">
+              <input type="text" id="master-email" placeholder="Usuario o correo del master" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf4ff">
+              <input type="password" id="master-password" placeholder="Contraseña del master" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf4ff">
+              <div id="master-auth-error" class="muted" style="display:none;color:#ffb4b4"></div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+                <button type="button" id="master-auth-cancel" class="btn-primary" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.06);">Cancelar</button>
+                <button type="button" id="master-auth-verify" class="btn-primary">Verificar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dialog/backdrop for processing states -->
+      <div id="dialog-backdrop" class="dialog-backdrop" aria-hidden="true">
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+          <h3 id="dialog-title">Procesando</h3>
+          <div id="dialog-message" style="margin-top:8px">Por favor espera <span class="spinner" aria-hidden="true"></span></div>
+        </div>
+      </div>
+      <script>
+        // Master auth handlers
+        (function(){
+          const modal = document.getElementById('master-auth-modal');
+          const verifyBtn = document.getElementById('master-auth-verify');
+          const cancelBtn = document.getElementById('master-auth-cancel');
+          const errEl = document.getElementById('master-auth-error');
+          if (!modal) return;
+          function closeModal() { modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); if (errEl) { errEl.style.display='none'; errEl.textContent=''; } }
+          function openModal(mode) { modal.dataset.mode = mode || 'master'; modal.classList.add('active'); modal.setAttribute('aria-hidden','false'); const em = document.getElementById('master-email'); setTimeout(()=>{ if (em) em.focus(); }, 50); }
+          if (cancelBtn) cancelBtn.addEventListener('click', function(){ closeModal(); });
+          if (verifyBtn) verifyBtn.addEventListener('click', async function(){
+            try {
+              if (verifyBtn) { verifyBtn.disabled = true; verifyBtn.dataset.orig = verifyBtn.textContent; verifyBtn.textContent = 'Verificando...'; }
+              const email = $trimVal('master-email');
+              const password = $val('master-password', '');
+              if (!email || !password) {
+                if (errEl) { errEl.style.display='block'; errEl.textContent = 'Email y contraseña requeridos.'; }
+                return;
+              }
+              showDialog('Verificando credenciales...');
+              const mode = modal.dataset.mode || 'master';
+              let endpoint = (mode === 'admin') ? '/api/admin/login_admin.php' : '/api/admin/verify_master.php';
+              const verifyUrl = (typeof buildApiUrl === 'function') ? buildApiUrl(endpoint) : (document.baseURI ? new URL('api/admin/' + endpoint.split('/').pop(), document.baseURI).href : 'api/admin/' + endpoint.split('/').pop());
+              const resp = await fetch(verifyUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ email: email, password: password }) });
+              const j = await resp.json().catch(()=>({}));
+              if (!resp.ok || !j.success) {
+                const m = j.message || 'Credenciales inválidas';
+                try { if (window.UI && UI.alertError) { UI.alertError(m); } else { showDialog({ type:'error', title:'Error', message: m }); } } catch(e){}
+                if (errEl) { errEl.style.display='block'; errEl.textContent = m; }
+                return;
+              }
+              // Success handling differs by mode
+              closeModal();
+              if (mode === 'master') {
+                // master -> admin registration
+                const btn = document.getElementById('show-register');
+                if (btn) { btn.dataset.requiresMaster = '0'; btn.style.display = 'inline-block'; }
+                try { showToast('Verificación exitosa — mostrando formulario de registro', 'success'); } catch(e){}
+                try { if (typeof switchForm === 'function') switchForm('register-form'); } catch(e){}
+                try { if (typeof prepareRegisterForm === 'function') prepareRegisterForm(); } catch(e){}
+                const regForm = document.getElementById('register-form'); if (regForm) { regForm.style.display = 'block'; regForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); const first = document.getElementById('reg-nombres') || regForm.querySelector('input,select,textarea'); if (first) first.focus(); }
+                try { const expires = (j && j.expires_at) ? (parseInt(j.expires_at) * 1000) : (Date.now() + 300000); if (expires) startVerifiedTimer(expires); } catch(e){}
+              } else {
+                // admin (not necessarily master) -> show client registration form
+                try { showToast('Verificación exitosa — mostrando formulario de cliente', 'success'); } catch(e){}
+                // create client form if not exists
+                const clientForm = document.getElementById('client-register-form');
+                if (clientForm) { clientForm.style.display = 'block'; clientForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); const first = clientForm.querySelector('input,select,textarea'); if (first) first.focus(); }
+                try { if (typeof prepareClientForm === 'function') prepareClientForm(); } catch(e){}
+              }
+            } catch (err) {
+              console.error('master auth error', err);
+              if (errEl) { errEl.style.display='block'; errEl.textContent = 'Error de red al verificar'; }
+            } finally {
+              if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.textContent = verifyBtn.dataset.orig || 'Verificar'; }
+              try { hideDialog(); } catch(e){}
+            }
+          });
+          // expose helpers
+          window.openMasterAuth = openModal;
+          window.closeMasterAuth = closeModal;
+        })();
+        function showDialog(message, title) {
+          try {
+            const bd = document.getElementById('dialog-backdrop');
+            const msg = document.getElementById('dialog-message');
+            const t = document.getElementById('dialog-title');
+            if (title && t) t.textContent = title;
+            if (message && msg) msg.firstChild && msg.removeChild(msg.firstChild);
+            if (message && msg) msg.textContent = message + ' ';
+            if (msg) {
+              const sp = document.createElement('span'); sp.className = 'spinner'; sp.setAttribute('aria-hidden','true'); msg.appendChild(sp);
+            }
+            if (bd) { bd.classList.add('active'); bd.setAttribute('aria-hidden','false'); }
+          } catch(e){ console.warn('showDialog error', e); }
+        }
+        function hideDialog() {
+          try { const bd = document.getElementById('dialog-backdrop'); if (bd) { bd.classList.remove('active'); bd.setAttribute('aria-hidden','true'); } } catch(e){}
+        }
+        // close dialog when clicking backdrop (not the dialog itself)
+        (function(){
+          const bd = document.getElementById('dialog-backdrop');
+          if (!bd) return;
+          bd.addEventListener('click', function(e){ if (e.target === bd) hideDialog(); });
+        })();
+        // Toast notifications (non-blocking)
+        (function(){
+          function createContainer(){
+            let c = document.getElementById('toast-container');
+            if (!c) { c = document.createElement('div'); c.id = 'toast-container'; c.className = 'toast-container'; document.body.appendChild(c); }
+            return c;
+          }
+          window.showToast = function(message, type='info', timeout=3500){
+            try {
+              const c = createContainer();
+              const t = document.createElement('div'); t.className = 'toast ' + (type||'info'); t.textContent = message;
+              c.appendChild(t);
+              // force reflow then show
+              requestAnimationFrame(()=> t.classList.add('show'));
+              if (timeout && timeout>0) setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>{ try{ t.remove(); }catch(e){} },220); }, timeout);
+              return t;
+            } catch(e){ console.warn('showToast failed', e); }
+          };
+        })();
+
+        // Verified-master visual timer: shows countdown and expires the inline register form
+        let __verifiedTimerId = null;
+        function startVerifiedTimer(expiresAtMs) {
+          try {
+            clearVerifiedTimer();
+            const banner = document.getElementById('verified-banner');
+            const countdown = document.getElementById('verified-countdown');
+            if (!banner || !countdown) return;
+            banner.style.display = 'flex';
+            function tick() {
+              const now = Date.now();
+              const diff = Math.max(0, expiresAtMs - now);
+              const sec = Math.floor(diff / 1000);
+              const mm = String(Math.floor(sec/60)).padStart(2,'0');
+              const ss = String(sec % 60).padStart(2,'0');
+              countdown.textContent = mm + ':' + ss;
+              if (diff <= 0) {
+                clearVerifiedTimer();
+                expireVerified();
+              }
+            }
+            tick();
+            __verifiedTimerId = setInterval(tick, 1000);
+          } catch(e){ console.warn('startVerifiedTimer error', e); }
+        }
+        function clearVerifiedTimer(){ if (__verifiedTimerId) { clearInterval(__verifiedTimerId); __verifiedTimerId = null; } try { const b=document.getElementById('verified-banner'); if(b) b.style.display='none'; } catch(e){} }
+        function expireVerified(){
+          try {
+            clearVerifiedTimer();
+            // hide register form and require re-verification
+            const regForm = document.getElementById('register-form'); if (regForm) regForm.style.display = 'none';
+            const showBtn = document.getElementById('show-register'); if (showBtn) { showBtn.dataset.requiresMaster = '1'; }
+            // the authorize-register button has been removed; require re-verification via master modal
+            showToast('La verificación master ha expirado. Por favor verifica de nuevo.', 'error', 5000);
+            // open master modal to prompt re-verification
+            const modal = document.getElementById('master-auth-modal'); if (modal) modal.classList.add('active');
+          } catch(e){ console.warn('expireVerified error', e); }
+        }
+        // Additional UI polish: entrance animations, logo float and accessible modal focus trapping
+        (function(){
+          document.addEventListener('DOMContentLoaded', function(){
+            try {
+              const card = document.querySelector('.card'); if (card) { card.classList.add('animate-in'); }
+              const logo = document.querySelector('.logo'); if (logo) { logo.classList.add('logo-float'); }
+            } catch(e){ console.warn('UI polish bootstrap failed', e); }
+          });
+
+          // Modal accessibility: add dialog enter animation and trap focus
+          const modal = document.getElementById('master-auth-modal');
+          if (!modal) return;
+          let lastFocused = null;
+          let keyHandler = null;
+          const dialogEl = modal.querySelector('.dialog');
+          const firstInput = modal.querySelector('input');
+
+          const observer = new MutationObserver(function(m){
+            m.forEach(rec => {
+              if (rec.attributeName === 'class') {
+                const active = modal.classList.contains('active');
+                if (active) {
+                  try { dialogEl && dialogEl.classList.add('dialog-enter'); } catch(e){}
+                  lastFocused = document.activeElement;
+                  try { if (firstInput) { firstInput.focus(); } }
+                  catch(e){}
+                  keyHandler = function(e){
+                    if (e.key === 'Escape') { modal.classList.remove('active'); }
+                    if (e.key === 'Tab') {
+                      const focusables = Array.from(modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select')).filter(n=>n.offsetParent!==null);
+                      if (focusables.length===0) return;
+                      const idx = focusables.indexOf(document.activeElement);
+                      if (e.shiftKey) {
+                        if (idx<=0) { focusables[focusables.length-1].focus(); e.preventDefault(); }
+                      } else {
+                        if (idx===focusables.length-1) { focusables[0].focus(); e.preventDefault(); }
+                      }
+                    }
+                  };
+                  document.addEventListener('keydown', keyHandler);
+                } else {
+                  try { dialogEl && dialogEl.classList.remove('dialog-enter'); } catch(e){}
+                  if (keyHandler) { document.removeEventListener('keydown', keyHandler); keyHandler = null; }
+                  try { if (lastFocused) lastFocused.focus(); } catch(e){}
+                }
+              }
+            });
+          });
+          observer.observe(modal, { attributes: true });
+        })();
+      </script>
+  </body>
+</html>

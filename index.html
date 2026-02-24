@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- Base href dinámico: calcula la base según la URL actual (evita rutas absolutas fijas)
+            Default ajustado al subdirectorio del proyecto para evitar 404s cuando el
+            servidor sirve desde /Sakorms.org/ -->
+        <base id="site-base" href="/Sakorms.org/Inventory-web1.5/">
+    </div>
+    <!-- Duplicate AI chatbot removed: only a single #aiChatbot should exist in the page -->
+    <script>
+        (function(){
+            try {
+                var p = location.pathname || '/';
+                // Si la ruta termina en 'Inventory-web1.5/' o en '/Sakorms.org/Inventory-web1.5' (con o sin slash), redirigir al login
+                if (/Inventory-web1\.5\/?$/.test(p)) {
+                    var target = p.replace(/\/?$/, '/') + 'login.html';
+                    if (!/login\.html$/.test(p)) {
+                        location.replace(target);
+                    }
+                }
+            } catch(e) { /* ignore */ }
+        })();
+    </script>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>📦 Inventario de Productos</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect fill='%23667eea' width='16' height='16'/><text x='8' y='12' font-size='14' font-weight='bold' text-anchor='middle' fill='white'>📦</text></svg>">
+    <link rel="stylesheet" href="app.css?t=20260130000000">
+    <script>
+        // Debug + fallback to ensure theme variables are correct when served
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const expected = {
+                    primary: '#667eea',
+                    primaryDark: '#764ba2'
+                };
+                const computedPrimary = (getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '').trim().toLowerCase();
+                console.info('🔍 CSS var --color-primary ->', computedPrimary || '(empty)');
+
+                if (!computedPrimary || computedPrimary !== expected.primary) {
+                    console.warn('⚠️ Detected mismatched or missing --color-primary. Restoring expected value...');
+                    document.documentElement.style.setProperty('--color-primary', expected.primary);
+                    document.documentElement.style.setProperty('--color-primary-dark', expected.primaryDark);
+                    // Give a tiny visual hint in the welcome dialog to confirm change (dev only)
+                    const w = document.getElementById('welcome-title');
+                    if (w) w.style.color = expected.primary;
+                    console.info('✅ Restored --color-primary to', expected.primary);
+                }
+            } catch (e) {
+                console.warn('Unable to inspect or set CSS variables', e);
+            }
+        });
+    </script>
+        <script>
+            // Floating Buttons UX/UI logic (solo WhatsApp, Calculadora, AI)
+            document.addEventListener('DOMContentLoaded', function() {
+                const fabWhats = document.querySelector('.fab-whatsapp');
+                const fabCalc = document.getElementById('btnCalc');
+                const fabAI = document.getElementById('btnAIChat');
+                const fabEnhance = document.getElementById('btnAIEnhance');
+                // Accesibilidad y animación
+                [fabWhats, fabCalc, fabAI, fabEnhance].forEach(btn => {
+                    if (btn) {
+                        btn.onfocus = function(){ btn.style.transform='scale(1.12)'; };
+                        btn.onblur = function(){ btn.style.transform='scale(1)'; };
+                        btn.onmouseover = function(){ btn.style.boxShadow='0 8px 32px #43cea2cc'; };
+                        btn.onmouseout = function(){ btn.style.boxShadow='0 8px 28px rgba(67,206,162,0.3)'; };
+                    }
+                });
+            });
+        </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+        <style>
+            :root{--accent:#6c5ce7;--accent-2:#00d4ff;--neon:#43f0ff}
+            .neon-line-strong{height:3px;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--neon),var(--accent-2));box-shadow:0 6px 30px rgba(108,92,231,0.12),0 0 24px rgba(67,240,255,0.06);margin:8px 0 18px}
+            .animate-in{animation:cardIn .6s cubic-bezier(.2,.9,.2,1) both}
+            @keyframes cardIn{from{transform:translateY(12px) scale(.995);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+        </style>
+            <!-- home-toggle demo styles removed to keep consistency with other sections -->
+            <style>
+                /* Collapse/expand animations for sections */
+                .section { position: relative; }
+                .section, .section-card { transition: max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease, transform 220ms ease; }
+                .section.collapsed, .section-card.collapsed { max-height: 0 !important; opacity: 0; transform: translateY(-8px); overflow: hidden; padding-top: 0 !important; padding-bottom: 0 !important; }
+                /* Collapse behavior when applying to the inner content (keep header visible) */
+                .section .section-content.collapsed { max-height: 0 !important; opacity: 0; transform: translateY(-8px); overflow: hidden; padding-top: 0 !important; padding-bottom: 0 !important; }
+                /* Ensure inner contents animate smoothly when collapsing */
+                .section .section-content, .section-card > * { transition: opacity 220ms ease; }
+
+                /* Section header styling (consistent across all sections) */
+                .section-header { display:flex; align-items:center; gap:12px; justify-content:space-between; padding:10px 12px; }
+                .section-header h2 { margin:0; font-size:1.15rem; display:flex; align-items:center; gap:10px; font-weight:700; color:#123; transition:color 180ms ease; }
+                .section-emoji { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg,#667eea22,#43cea222); color:#3b3b3b; font-size:18px; box-shadow:0 6px 18px rgba(0,0,0,0.04); }
+                .section .section-content { transition: max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease, padding 180ms ease; }
+
+                /* Make all .btn-toggle-section look like the panel pill button */
+                .btn-toggle-section { position: absolute; top:12px; right:18px; background: linear-gradient(135deg,#667eea 0%,#6b8ce8 35%,#764ba2 100%); color:#fff; border:none; padding:10px 18px; border-radius:14px; font-weight:700; display:inline-flex; align-items:center; gap:10px; box-shadow:0 10px 30px rgba(102,126,234,0.18), 0 4px 10px rgba(0,0,0,0.08); z-index:9999; cursor:pointer; transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease; }
+                .btn-toggle-section:hover{ transform: translateY(-2px); box-shadow: 0 14px 38px rgba(102,126,234,0.22); }
+                /* When a section is collapsed but we want to keep only the header visible */
+                .section.header-only { overflow: visible; }
+                .section.header-only .section-content { display: none !important; max-height: 0 !important; padding: 0 !important; opacity: 0 !important; }
+                .section.header-only .section-header { padding: 12px 18px; }
+                /* Panel toggle styled like the screenshot (purple pill) */
+                .btn-panel-toggle {
+                    position: absolute;
+                    top: 12px;
+                    right: 18px;
+                    background: linear-gradient(135deg,#667eea 0%,#6b8ce8 35%,#764ba2 100%);
+                    color: #fff;
+                    border: none;
+                    padding: 10px 18px;
+                    border-radius: 14px;
+                    font-weight: 700;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    box-shadow: 0 10px 30px rgba(102,126,234,0.18), 0 4px 10px rgba(0,0,0,0.08);
+                    z-index: 9999;
+                    cursor: pointer;
+                    transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+                }
+                .btn-panel-toggle:hover{ transform: translateY(-2px); box-shadow: 0 14px 38px rgba(102,126,234,0.22); }
+                .btn-panel-toggle i{ font-size:14px; transform: translateY(-1px); }
+                @media (max-width:720px){
+                    .btn-panel-toggle{ top:10px; right:12px; padding:8px 10px; font-size:13px }
+                }
+            </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js" defer></script>
+
+        <!-- Fix: ensure inputs/tables remain readable when AI enhance mode is toggled -->
+        <style id="ai-enhance-fix">
+            body.ai-enhanced input,
+            body.ai-enhanced textarea,
+            body.ai-enhanced select,
+            body.ai-enhanced .login-card input,
+            body.ai-enhanced .login-main input,
+            body.ai-enhanced .login-container input,
+            body.ai-enhanced .input-with-btn input,
+            body.ai-enhanced .modal-content input,
+            body.ai-enhanced .dialog input,
+            body.ai-enhanced table,
+            body.ai-enhanced th,
+            body.ai-enhanced td,
+            body.ai-enhanced .table-container td {
+                background: linear-gradient(180deg,#071026,#0b1220) !important;
+                color: #eaf4ff !important;
+                border-color: rgba(255,255,255,0.06) !important;
+                box-shadow: none !important;
+            }
+            body.ai-enhanced input::placeholder,
+            body.ai-enhanced textarea::placeholder {
+                color: rgba(234,244,255,0.75) !important;
+                opacity: 1 !important;
+            }
+        </style>
+
+    <style>
+        /* Make skip-link visible only when focus-visible (keyboard users) */
+        .skip-link { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+        .skip-link:focus-visible {
+            position:fixed !important;
+            left:12px !important;
+            top:12px !important;
+            width:auto !important;
+            height:auto !important;
+            padding:8px 12px !important;
+            background: linear-gradient(90deg,#764ba2 0%,#43cea2 100%) !important;
+            color:#fff !important;
+            border-radius:8px !important;
+            box-shadow:0 8px 26px rgba(118,75,162,0.18) !important;
+            z-index:100000 !important;
+            text-decoration:none !important;
+            border:1px solid rgba(255,255,255,0.08) !important;
+        }
+    </style>
+
+    <!-- Nota: archivos deprecated/archivados no son cargados para evitar conflictos de caché -->
+    <!-- Módulos globales y de la aplicación (orden: globals -> api/config -> ui/helpers -> features -> main) -->
+    <script src="js/globals.js?t=20260130000000" defer></script>
+    <script src="js/api.js?t=20260129000000" defer></script>
+    <script src="js/config.js?t=20260129000000" defer></script>
+    <script src="js/ui-loader.js?t=20260130000000" defer></script>
+    <script>
+    (function(){
+            const url = 'js/ui.js?t=20260129000000';
+        function inject(code){
+                try {
+                // Basic diagnostics: report length and tail to aid debugging in case of truncation
+                try { const len = (code && code.length) ? code.length : 0; const tail = code ? code.slice(-240) : ''; console.info('ui.js: inject content length', len); console.info('ui.js: inject tail ->', tail.replace(/\n/g,'¶')) } catch(e){}
+                // Safer injection: avoid executing code strings with `new Function`.
+                const s=document.createElement('script'); s.type='text/javascript'; s.text = code + '\n//# sourceURL=' + url; document.head.appendChild(s);
+                console.log('ui.js: injected (safer)');
+            } catch(e) {
+                console.error('ui.js: injection failed', e);
+                // Fallback: try loading as external script (allows browser to fetch/parse directly)
+                try {
+                    const s2 = document.createElement('script');
+                    s2.src = url;
+                    s2.defer = false;
+                    s2.async = false;
+                    s2.onload = function(){ console.log('ui.js: injected via src fallback'); };
+                    s2.onerror = function(err){ console.error('ui.js: src fallback failed', err); injectShim(); };
+                    document.head.appendChild(s2);
+                } catch(err){
+                    console.error('ui.js: fallback failed', err);
+                    injectShim();
+                }
+            }
+        }
+        function injectShim(){
+            if (window.UI && window.UI._isEnhanced) return;
+            window.UI = window.UI || {};
+            
+            // Crear un modal HTML mejorado en lugar de usar alert()
+            function createModalElement() {
+                if (document.getElementById('shim-modal')) return document.getElementById('shim-modal');
+                const modal = document.createElement('div');
+                modal.id = 'shim-modal';
+                modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui,-apple-system,sans-serif;';
+                modal.innerHTML = '<div style="background:white;border-radius:12px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.3);max-width:500px;width:90%;"><div id="shim-modal-title" style="font-size:18px;font-weight:600;margin-bottom:12px;color:#333;"></div><div id="shim-modal-message" style="font-size:14px;color:#666;line-height:1.6;margin-bottom:20px;"></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button id="shim-modal-close" style="padding:10px 20px;background:#007bff;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:500;">OK</button></div></div>';
+                document.body.appendChild(modal);
+                document.getElementById('shim-modal-close').addEventListener('click', () => { modal.style.display = 'none'; });
+                return modal;
+            }
+            
+            window.UI.toast = function(msg){ 
+                try { 
+                    const modal = createModalElement();
+                    document.getElementById('shim-modal-title').textContent = '📢 Notificación';
+                    document.getElementById('shim-modal-message').textContent = String(msg);
+                    modal.style.display = 'flex'; 
+                } catch(e){} 
+            };
+            
+            window.UI.showDialog = function(opts){ 
+                try { 
+                    const modal = createModalElement();
+                    document.getElementById('shim-modal-title').textContent = (opts && opts.title) || 'Sistema';
+                    const message = (opts && (opts.message || opts.html || '')) || '';
+                    document.getElementById('shim-modal-message').innerHTML = String(message).replace(/\n/g, '<br>');
+                    modal.style.display = 'flex'; 
+                } catch(e){} 
+                return { close: function(){} }; 
+            }; 
+            console.warn('ui.js: minimal UI shim injected'); 
+        }
+        fetch(url, { cache: 'no-store' }).then(r => {
+            if (!r.ok) { console.error('ui.js loader: fetch failed', r.status); injectShim(); return null; }
+            return r.text();
+        }).then(t => {
+            if (!t) return;
+            const trimmed = t.trim();
+            if (trimmed.charAt(0) === '<') { console.error('ui.js loader: fetched content looks like HTML — aborting injection'); injectShim(); return; }
+            if (!trimmed.endsWith('// EOF - end of js/ui.js')) { console.error('ui.js loader: EOF marker missing — aborting injection'); injectShim(); return; }
+            inject(t);
+        }).catch(e => { console.error('ui.js loader: fetch error', e); injectShim(); });
+    })();
+    </script>
+
+    <script src="js/helpers.js?t=20260129000000" defer></script>
+    <script src="js/auth.js?t=20260129000000" defer></script>
+    <script src="js/ai.js?t=20260129000000" defer></script>
+    <script src="js/calculator.js?t=20260129000000" defer></script>
+    <script src="js/sections.js?t=20260129000000" defer></script>
+    <script src="js/test.js?t=20260129000000" defer></script>
+    <script src="js/data-onclick-wrappers.js?t=20260221" defer></script>
+    <script src="main.js?t=20260129000000" defer></script>
+            <script>
+                // Cargar categorías automáticamente al cargar la página principal
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof cargarCategorias === 'function') {
+                        cargarCategorias();
+                    } else {
+                        // Si main.js es defer, esperar a que esté disponible
+                        setTimeout(function waitForCategorias() {
+                            if (typeof cargarCategorias === 'function') {
+                                cargarCategorias();
+                            } else {
+                                setTimeout(waitForCategorias, 100);
+                            }
+                        }, 100);
+                    }
+                });
+            </script>
+        <script>
+            // UX/UI: Al recargar, forzar que la vista quede arriba y resaltar header
+            window.addEventListener('pageshow', function(e) {
+                // Forzar scroll arriba — timeout pequeño para sobreescribir restauración del navegador (bfcache / reload)
+                setTimeout(function(){ window.scrollTo(0,0); }, 0);
+
+                const header = document.querySelector('.main-header');
+                if(header) {
+                    header.style.transition = 'box-shadow 0.5s, background 0.5s';
+                    header.style.boxShadow = '0 0 0 4px #667eea88, 0 8px 32px #667eea22';
+                    header.style.background = 'linear-gradient(90deg,#667eea 60%,#43cea2 100%)';
+                    setTimeout(()=>{
+                        header.style.boxShadow = '';
+                        header.style.background = '';
+                    }, 1200);
+                }
+            });
+
+            // Refuerzo adicional: en algunos navegadores la posición puede restaurarse después de 'load',
+            // así que también forzamos scroll arriba al evento 'load' con un pequeño delay.
+            window.addEventListener('load', function(){ setTimeout(function(){ window.scrollTo(0,0); }, 50); });
+        </script>
+    <script src="js/scroll-top.js?t=20260130010000" defer></script>
+    <script src="js/inline-handler-polyfill.js" defer></script>
+    
+    <!-- Cache Busting and Error Detection -->
+    <script>
+        // Fuerza actualización si hay versión vieja en caché
+        (function() {
+            const currentVersion = '20260129000000';
+            const storedVersion = localStorage.getItem('app_version');
+            
+            if (storedVersion && storedVersion !== currentVersion) {
+                console.warn('🔄 Versión antigua detectada. Limpiando caché...');
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload(true);
+            }
+            
+            localStorage.setItem('app_version', currentVersion);
+            
+            // Agregar headers de no-caché
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+        })();
+        
+        // Detectar y reportar errores de JavaScript y fallos de carga de recursos (capturing=true para recursos)
+        window.addEventListener('error', function(event) {
+            try {
+                // Fallo de carga de recursos (script/img/link) - event.target será el elemento
+                if (event.target && (event.target.src || event.target.href)) {
+                    const url = event.target.src || event.target.href;
+                    console.error('🔴 Recurso falló al cargar:', event.target.tagName, url);
+                    return;
+                }
+
+                // Mensajes de error de tiempo de ejecución de JS (cache-related patterns)
+                const msg = event.message || '';
+                if (msg && (msg.includes('#btn') || msg.includes('already been declared'))) {
+                    console.error('🔴 Error de caché detectado:', msg);
+                    try {
+                        const baseEl = document.querySelector('base');
+                        const basePath = baseEl ? baseEl.getAttribute('href') : '/';
+                        console.error('Solución: Abre ' + (location.origin + basePath + 'clear-cache.php'));
+                    } catch(e){ console.error('Solución: Abre clear-cache.php (no se pudo resolver base)', e); }
+                }
+            } catch (e) { console.warn('Error en el manejador fallido', e); }
+        }, true);
+    </script>
+</head>
+<body>
+    <!-- Skip link para accesibilidad -->
+    <a class="skip-link" href="#main-content" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Saltar al contenido</a>
+    <!-- Header Section -->
+    <header class="main-header animate-in">
+        <h1>
+            <i class="fas fa-rocket"></i> Gestión de Inventario 📦✨
+        </h1>
+        <div class="neon-line-strong" aria-hidden="true"></div>
+    </header>
+
+        <!-- Floating Action Buttons (FAB) - Solo WhatsApp, Calculadora y Asistente Virtual, centrados verticalmente -->
+        <div id="floating-buttons-wrapper">
+            <!-- Asistente Virtual (AI) - Primero -->
+              <button class="fab-btn fab-ai" id="btnAIChat" title="Asistente Virtual 🤖 (Ayuda en línea)" aria-label="Abrir asistente virtual"
+                                    style="width:70px;height:70px;background:linear-gradient(135deg,#ffb74d 0%,#ff9800 100%);color:#fff;box-shadow:0 0 0 4px #fffbe6,0 8px 28px rgba(255,152,0,0.3);font-size:2.3rem;border-radius:50%;transition:box-shadow 0.2s,transform 0.2s;outline:3px solid #ff9800;outline-offset:2px;">
+                <i class="fas fa-robot"></i>
+            </button>
+            <!-- Calculadora - Segundo -->
+            <button class="fab-btn fab-calc" id="btnCalc" title="Calculadora" aria-label="Abrir calculadora"
+                style="width:64px;height:64px;background:linear-gradient(135deg,#fffbe6 0%,#ffe0c3 100%);color:#ff9800;box-shadow:0 8px 28px rgba(255,183,77,0.3);font-size:2rem;border:3px solid #ff9800;border-radius:50%;transition:background 0.2s,transform 0.2s;">
+                <i class="fas fa-calculator"></i>
+            </button>
+            <!-- Mejorar con AI - Tercero -->
+            <button class="fab-btn fab-ai" id="btnAIEnhance" title="Mejorar con AI ✨" aria-label="Mejorar con AI"
+                style="width:64px;height:64px;background:linear-gradient(135deg,#00f0ff 0%,#7e00ff 100%);color:#fff;box-shadow:0 0 0 3px #fffbe6,0 8px 28px rgba(126,0,255,0.25);font-size:2.1rem;border-radius:50%;transition:box-shadow 0.2s,transform 0.2s;outline:2.5px solid #7e00ff;outline-offset:2px;">
+                <i class="fas fa-magic"></i>
+            </button>
+            <!-- WhatsApp - Último -->
+            <a href="https://wa.me/5549130325" target="_blank" class="fab-btn fab-whatsapp" title="WhatsApp" aria-label="WhatsApp"
+                 style="width:64px;height:64px;background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:#fff;box-shadow:0 8px 28px rgba(37,211,102,0.3);font-size:2rem;text-decoration:none;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s,transform 0.2s;">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <!-- (duplicado de "Mejorar con AI" eliminado) -->
+            <!-- FAB animations moved to CSS -->
+        </div>
+
+    <!-- Navigation Section -->
+    <nav class="navbar" role="navigation" aria-label="Principal">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <!-- Navbar Brand/Logo -->
+                <div class="navbar-brand">
+                    <a href="index.php" data-onclick="return navegarA(event, 'home')" data-target="home" class="navbar-brand-link" aria-label="Ir al inicio"><i class="fas fa-cubes" aria-hidden="true"></i> <span class="navbar-brand-text">Sakorms</span></a>
+                    <!-- Botón para restaurar vista completa -->
+                    <a href="#" class="navbar-link" data-onclick="return mostrarTodo(event)" aria-label="Mostrar toda la página">Ver todo</a>
+                </div>
+                <!-- Hamburger (mobile) -->
+                <button id="nav-hamburger" aria-controls="hamburger-menu" aria-label="Abrir menú" title="Menú" class="nav-hamburger-btn" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
+                <div id="hamburger-menu" class="hamburger-menu" aria-hidden="true" role="menu">
+                    <div class="hamburger-content">
+                        <div class="hamburger-title">Configuración</div>
+                        <div class="hamburger-row"><button class="btn" id="btn-check-telemetry" role="menuitem">Ver Telemetría</button></div>
+                        <div class="hamburger-row">
+                            <button class="btn" id="btn-optin-telemetry" role="menuitem">Permitir telemetría</button>
+                            <button class="btn" id="btn-optout-telemetry" role="menuitem">Denegar</button>
+                        </div>
+                        <hr class="hamburger-sep">
+                        <div class="hamburger-title">Asistente AI</div>
+                        <div class="hamburger-row">
+                            <button class="btn" id="btn-ai-consent-grant" role="menuitem">Permitir</button>
+                            <button class="btn" id="btn-ai-consent-revoke" role="menuitem">Revocar</button>
+                            <label class="hamburger-switch" style="margin-left:auto;display:flex;align-items:center;gap:8px;"><input type="checkbox" id="chk-ai-local" aria-label="Modo AI local"> Modo local</label>
+                        </div>
+                        <hr class="hamburger-sep">
+                        <div class="hamburger-title">Mantenimiento</div>
+                        <div class="hamburger-row">
+                            <button class="btn primary" id="btn-init-db" role="menuitem">Inicializar BD</button>
+                            <button class="btn" id="btn-only-dialogs" role="menuitem">Solo diálogos</button>
+                        </div>
+                        <div class="hamburger-row">
+                            <button class="btn" id="btn-ver-todo" data-onclick="mostrarTodo()" role="menuitem">Ver todo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-center">
+                <!-- Buscador eliminado por solicitud: input `nav-search-input` removido -->
+            </div>
+            <ul class="navbar-menu" role="menubar" aria-label="Navegación principal">
+                <li class="navbar-item">
+                    <a href="index.php#registro-productos" data-onclick="return navegarA(event, 'registro-productos')" data-target="registro-productos" class="navbar-link" role="menuitem" title="Registrar">
+                        <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                        <span>Registrar</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" data-onclick="return navegarA(event, 'filtros')" data-target="filtros" class="navbar-link" title="Filtros">
+                        <i class="fas fa-filter" aria-hidden="true"></i>
+                        <span>Filtros</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" data-onclick="return navegarA(event, 'productos')" data-target="productos" class="navbar-link" title="Productos">
+                        <i class="fas fa-box" aria-hidden="true"></i>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" data-onclick="return navegarA(event, 'importar-exportar')" data-target="importar-exportar" class="navbar-link" title="Importar">
+                        <i class="fas fa-file-import" aria-hidden="true"></i>
+                        <span>Importar</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" data-onclick="return navegarA(event, 'ejemplo-tabla')" data-target="ejemplo-tabla" class="navbar-link" title="Cargar">
+                        <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                        <span>Cargar</span>
+                    </a>
+                </li>
+                <!-- API Ejemplo eliminado del menú -->
+                <li class="navbar-item">
+                    <a href="#" data-onclick="return navegarA(event, 'registro-categorias')" data-target="registro-categorias" class="navbar-link" title="Categorías">
+                        <i class="fas fa-list" aria-hidden="true"></i>
+                        <span>Categorías</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a href="#" data-onclick="return navegarA(event, 'contacto')" data-target="contacto" class="navbar-link" title="Contacto">
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span>Contacto</span>
+                    </a>
+                </li>
+                <!-- Administrar Clientes link moved to admin login page -->
+                <!-- Ajustes movidos al menú hamburguesa -->
+            </ul>
+            
+            <!-- Navbar Toggle for Mobile -->
+            <button class="navbar-toggle" id="navbar-toggle" aria-controls="hamburger-menu" aria-expanded="false" aria-label="Alternar navegación">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+    <script>
+        // Ensure the small hamburger button toggles the same hamburger menu
+        (function(){
+            document.addEventListener('DOMContentLoaded', function(){
+                const smallBtn = document.getElementById('nav-hamburger');
+                const panel = document.getElementById('hamburger-menu');
+                if(!smallBtn || !panel) return;
+                smallBtn.addEventListener('click', function(e){
+                    const isShown = panel.classList.toggle('show');
+                    smallBtn.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+                    panel.setAttribute('aria-hidden', isShown ? 'false' : 'true');
+                });
+            });
+        })();
+    </script>
+
+    <!-- Mensajes de éxito y error (se gestionan mediante `UI` ahora; div antiguo eliminado) -->
+
+    <!-- Cuadro de diálogo de bienvenida -->
+    <div id="welcome-dialog" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(102,126,234,0.08);backdrop-filter:blur(2px);" role="dialog" aria-labelledby="welcome-title" aria-modal="true">
+      <div style="background:linear-gradient(135deg,#f8f9ff 70%,#f0f4ff 100%);border-radius:24px;box-shadow:0 20px 60px rgba(102,126,234,0.3),0 4px 20px rgba(0,0,0,0.1);padding:40px 42px 32px 42px;max-width:560px;width:92vw;display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;border:1px solid rgba(102,126,234,0.1);">
+        <button id="close-welcome" aria-label="Cerrar bienvenida" type="button" style="position:absolute;top:16px;right:20px;background:transparent;border:none;font-size:2rem;color:#667eea;cursor:pointer;font-weight:bold;transition:color 0.2s,transform 0.2s;z-index:10;padding:4px 8px;" data-onclick="closeWelcome()">&times;</button>
+        <h1 id="welcome-title" style="color:#667eea;font-size:2.2rem;font-family:'Poppins',sans-serif;font-weight:700;text-shadow:0 2px 12px rgba(102,126,234,0.1);margin-bottom:8px;text-align:center;">
+          ¡Bienvenido al Inventario de Productos!
+        </h1>
+        <p style="color:#2c3e50;font-size:1.1rem;text-align:center;margin-bottom:6px;line-height:1.6;">
+          Gestiona, consulta y organiza tus productos de forma eficiente y segura.<br>
+          <span style="color:#667eea;font-weight:600;">Sigue las instrucciones para aprovechar todas las funciones del sistema.</span>
+        </p>
+        <ul style="color:#2c3e50;font-size:1.05rem;text-align:left;list-style:none;margin:0;padding:0;max-width:480px;">
+          <li style="padding:8px 0;padding-left:28px;position:relative;"><span style="position:absolute;left:0;color:#667eea;font-weight:700;">✓</span> Registra nuevos productos usando el formulario correspondiente.</li>
+          <li style="padding:8px 0;padding-left:28px;position:relative;"><span style="position:absolute;left:0;color:#667eea;font-weight:700;">✓</span> Utiliza los filtros para buscar y organizar tu inventario.</li>
+          <li style="padding:8px 0;padding-left:28px;position:relative;"><span style="position:absolute;left:0;color:#667eea;font-weight:700;">✓</span> Edita o elimina productos desde la tabla de registros.</li>
+          <li style="padding:8px 0;padding-left:28px;position:relative;"><span style="position:absolute;left:0;color:#667eea;font-weight:700;">✓</span> Importa o exporta tu inventario en diferentes formatos.</li>
+          <li style="padding:8px 0;padding-left:28px;position:relative;"><span style="position:absolute;left:0;color:#667eea;font-weight:700;">✓</span> Consulta la sección de ayuda o contáctanos si tienes dudas.</li>
+        </ul>
+        <span id="welcome-timer" style="color:#667eea;font-size:1rem;margin-top:12px;font-weight:600;">Este mensaje se cerrará en 40 segundos...</span>
+      </div>
+    </div>
+
+    <!-- Home section (landing) - panel de control con accesos directos -->
+    <section id="home" class="section" role="region" aria-label="Inicio">
+        <!-- Toggle button positioned at top-right of the panel (purple pill) -->
+        <button class="btn-toggle-section btn-panel-toggle" type="button" aria-expanded="true" aria-controls="home-content">
+            <i class="fas fa-chevron-up"></i> Ocultar
+        </button>
+        <div style="position:relative;padding:20px 18px;max-width:1200px;margin:0 auto;">
+            <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;">
+                <!-- Left column: welcome + actions -->
+                <div style="flex:1 1 520px;min-width:320px;">
+                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:16px;min-width:0;">
+                            <div style="flex:0 0 84px;height:64px;background:linear-gradient(90deg,#667eea,#43cea2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;box-shadow:0 8px 28px rgba(102,126,234,0.12)">📦</div>
+                            <div style="min-width:0;">
+                                <h2 style="margin:0;font-size:1.6rem;color:#1f2d3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Panel de Control</h2>
+                                <p style="margin:6px 0 0;color:#556;">Accede rápidamente a las secciones más usadas y revisa el estado general del inventario.</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div style="margin-top:8px;">
+                        <!-- Contenido colapsable: ahora incluye tanto columna izquierda como el aside para permitir colapsar todo el panel -->
+                        <div id="home-content" class="section-content" style="display:block;">
+                            <div id="home-panel" style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;">
+                                <div style="flex:1 1 520px;min-width:320px;">
+                                    <div class="quick-actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                                        <button class="btn primary" data-target="registro-productos" style="padding:12px 16px;">➕ Registrar Producto</button>
+                                        <button class="btn" data-target="productos" style="padding:12px 16px;">📦 Ver Productos</button>
+                                        <button class="btn" data-target="importar-exportar" style="padding:12px 16px;">⬆️ Importar / Exportar</button>
+                                        <button class="btn" data-target="registro-categorias" style="padding:12px 16px;">📋 Categorías</button>
+                                    </div>
+
+                                    <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+                                        <div style="flex:1 1 180px;background:#fff;border-radius:10px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.04);">
+                                            <div style="font-size:13px;color:#889">Productos</div>
+                                            <div style="font-size:20px;font-weight:700;color:#2c3e50">5</div>
+                                        </div>
+                                        <div style="flex:1 1 180px;background:#fff;border-radius:10px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.04);">
+                                            <div style="font-size:13px;color:#889">Proveedores</div>
+                                            <div style="font-size:20px;font-weight:700;color:#2c3e50">2</div>
+                                        </div>
+                                        <div style="flex:1 1 180px;background:#fff;border-radius:10px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.04);">
+                                            <div style="font-size:13px;color:#889">Ventas (hoy)</div>
+                                            <div style="font-size:20px;font-weight:700;color:#2c3e50">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right column: activity / shortcuts -->
+                                <aside style="flex:0 0 340px;min-width:260px;">
+                                    <div style="background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.04);margin-bottom:12px;">
+                                        <div style="font-weight:700;color:#2c3e50;margin-bottom:8px;">Atajos rápidos</div>
+                                        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">
+                                            <li><a href="#" data-target="registro-productos">➕ Nuevo producto</a></li>
+                                            <li><a href="#" data-target="productos">📦 Gestionar productos</a></li>
+                                            <li><a href="#" data-target="registro-clientes">👥 Clientes</a></li>
+                                            <li><a href="#" data-target="registro-proveedores">🚚 Proveedores</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <div style="background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.04);">
+                                        <div style="font-weight:700;color:#2c3e50;margin-bottom:8px;">Actividad reciente</div>
+                                        <div style="font-size:13px;color:#667;">No hay actividad reciente.</div>
+                                    </div>
+                                </aside>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <script>
+        (function(){
+            var STORAGE_KEY = 'sections_visibility_v1';
+            function readState(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ return {}; } }
+            function writeState(obj){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); } catch(e){} }
+
+            function detectHiddenFromDOM(el){
+                try {
+                    if (!el) return false;
+                    if (el.classList && el.classList.contains('collapsed')) return true;
+                    if (el.getAttribute && el.getAttribute('aria-hidden') === 'true') return true;
+                    var cs = window.getComputedStyle(el);
+                    if (cs && cs.display === 'none') return true;
+                    if (el.offsetHeight === 0) return true;
+                } catch(e){}
+                return false;
+            }
+
+            // Animaciones reales: colapsar/expandir usando la clase 'collapsed' y max-height dinámica
+            function animateCollapse(el){
+                return new Promise(function(resolve){
+                    try {
+                        el.style.transition = 'max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease';
+                        // Set explicit max-height to current height to allow smooth transition to 0
+                        var startH = el.scrollHeight;
+                        el.style.maxHeight = startH + 'px';
+                        // Force style flush
+                        void el.offsetHeight;
+                        // then collapse
+                        el.style.maxHeight = '0px';
+                        el.classList.add('collapsed');
+                        el.setAttribute('aria-hidden','true');
+                        var done = function(){
+                            el.removeEventListener('transitionend', done);
+                            // Keep max-height 0 to preserve collapsed state
+                            resolve();
+                        };
+                        el.addEventListener('transitionend', done);
+                        // safety timeout
+                        setTimeout(resolve, 500);
+                    } catch(e){ resolve(); }
+                });
+            }
+
+            function animateExpand(el){
+                return new Promise(function(resolve){
+                    try {
+                        el.classList.remove('collapsed');
+                        el.setAttribute('aria-hidden','false');
+                        // Compute target height
+                        var targetH = el.scrollHeight;
+                        el.style.maxHeight = '0px';
+                        // Force flush
+                        void el.offsetHeight;
+                        el.style.transition = 'max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease';
+                        el.style.maxHeight = targetH + 'px';
+                        var done = function(){
+                            el.removeEventListener('transitionend', done);
+                            // Remove inline max-height so it can grow/shrink naturally
+                            el.style.maxHeight = '';
+                            resolve();
+                        };
+                        el.addEventListener('transitionend', done);
+                        // safety timeout
+                        setTimeout(function(){ el.style.maxHeight = ''; resolve(); }, 600);
+                    } catch(e){ resolve(); }
+                });
+            }
+
+            function setupToggleButton(btn){
+                var targetId = btn.getAttribute('aria-controls');
+                if (!targetId) return;
+                var content = document.getElementById(targetId) || document.getElementById(targetId.replace(/-content$/,''));
+                if (!content) return;
+                // If the target points to the whole section element, prefer its inner '.section-content' or an element with id '{targetId}-content'
+                try {
+                    var isSectionElement = (content.tagName && content.tagName.toLowerCase() === 'section') || (content.classList && content.classList.contains('section'));
+                    // honor explicit request to collapse the full section when button has data-collapse="section"
+                    var collapseSection = btn.getAttribute && btn.getAttribute('data-collapse') === 'section';
+                    if (isSectionElement && !collapseSection) {
+                        var inner = content.querySelector('.section-content') || document.getElementById(targetId + '-content');
+                        if (inner) content = inner;
+                    }
+                    // if collapseSection===true, keep `content` as the section element so animations apply to the whole section
+                } catch(e){}
+                var visual = content.closest('section') || content.closest('.section') || content;
+
+                // initialize state
+                var saved = readState();
+                var domHidden = detectHiddenFromDOM(content) || detectHiddenFromDOM(visual);
+                var initiallyHidden = (typeof saved[targetId] === 'boolean') ? saved[targetId] : domHidden;
+
+                
+
+                // Apply initial collapsed state to the inner content (keep section header visible)
+                if (initiallyHidden) {
+                    if (!content.classList.contains('collapsed')) content.classList.add('collapsed');
+                    try { content.setAttribute('aria-hidden','true'); } catch(e){}
+                } else {
+                    content.classList.remove('collapsed');
+                    try { content.setAttribute('aria-hidden','false'); } catch(e){}
+                }
+
+                // Initialize button label
+                if (initiallyHidden){
+                    btn.innerHTML = '<i class="fas fa-chevron-down"></i> Mostrar';
+                    btn.setAttribute('aria-expanded','false');
+                } else {
+                    btn.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar';
+                    btn.setAttribute('aria-expanded','true');
+                }
+
+                try { btn.removeAttribute('onclick'); btn.removeAttribute('data-onclick'); } catch(e){}
+
+                btn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    btn.disabled = true;
+                    var nowHidden = detectHiddenFromDOM(visual) || detectHiddenFromDOM(content);
+                    var willHide = !nowHidden;
+
+                    // Perform animated collapse/expand on the inner content; pulse the visual container
+                    (willHide ? animateCollapse(content) : animateExpand(content)).then(function(){
+                        try {
+                            if (willHide) {
+                                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Mostrar';
+                                btn.setAttribute('aria-expanded','false');
+                            } else {
+                                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar';
+                                btn.setAttribute('aria-expanded','true');
+                            }
+                        } catch(e){}
+                        // apply header-only mode (keep header + toggle visible) when content is hidden
+                        try {
+                            if (willHide) {
+                                visual.classList.add('header-only');
+                                try { var inner = visual.querySelector(':scope > div'); if (inner) inner.style.paddingBottom = '0'; } catch(e){}
+                            } else {
+                                visual.classList.remove('header-only');
+                                try { var inner = visual.querySelector(':scope > div'); if (inner) inner.style.paddingBottom = ''; } catch(e){}
+                            }
+                        } catch(e){}
+
+                        // brief visual acknowledgement (pulse) on the outer visual container
+                        try {
+                            visual.style.transition = 'box-shadow 220ms ease, transform 220ms ease';
+                            visual.style.boxShadow = '0 8px 32px rgba(102,126,234,0.12)';
+                            visual.style.transform = 'translateY(-2px)';
+                            setTimeout(function(){ visual.style.removeProperty('box-shadow'); visual.style.removeProperty('transform'); }, 260);
+                        } catch(e){}
+
+                        var s = readState(); s[targetId] = willHide; writeState(s);
+                        try { window.dispatchEvent(new CustomEvent('sectionToggled', { detail: { id: targetId, hidden: willHide } })); } catch(e){}
+                        try { btn.disabled = false; } catch(e){}
+                    }).catch(function(){ try{ btn.disabled = false; }catch(e){} });
+                });
+            }
+
+            function initAll(){
+                var btns = document.querySelectorAll('.btn-toggle-section');
+                btns.forEach(setupToggleButton);
+            }
+
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll); else initAll();
+        })();
+    </script>
+    <script>
+        // Enhance all sections: add header class, emoji pill and ensure toggles look consistent
+        (function(){
+            var iconMap = {
+                'home':'📦',
+                'filtros':'🔎',
+                'productos':'📦',
+                'importar-exportar':'📁',
+                'ejemplo-tabla':'📤',
+                'registro-productos':'➕',
+                'ventas':'🧾',
+                'salidas':'⬅️',
+                'clientes':'👥',
+                'proveedores':'🚚'
+            };
+
+            function ensureHeader(section){
+                try{
+                    // find the header wrapper (first direct child that contains an h2 or h3)
+                    var hdr = null;
+                    for(var i=0;i<section.children.length;i++){
+                        var c = section.children[i];
+                        if(c.querySelector && c.querySelector('h2, h3')){ hdr = c; break; }
+                    }
+                    if(!hdr) return;
+                    hdr.classList.add('section-header');
+
+                    var h = hdr.querySelector('h2, h3');
+                    if(h && !h.querySelector('.section-emoji')){
+                        var span = document.createElement('span');
+                        span.className = 'section-emoji';
+                        var id = section.id || '';
+                        span.textContent = iconMap[id] || '📁';
+                        h.insertBefore(span, h.firstChild);
+                    }
+
+                    // move toggle button as a direct child of the section so absolute positioning aligns
+                    var btn = hdr.querySelector('.btn-toggle-section');
+                    if(btn){
+                        // move to be direct child if not already
+                        if(btn.parentElement !== section){
+                            section.insertBefore(btn, section.firstChild);
+                        }
+                        // ensure aria-controls exists
+                        if(!btn.getAttribute('aria-controls')){
+                            var cid = section.id ? section.id + '-content' : section.id;
+                            if(cid) btn.setAttribute('aria-controls', cid);
+                        }
+                    }
+
+                }catch(e){console.warn('section enhancement failed', e);}
+            }
+
+            document.addEventListener('DOMContentLoaded', function(){
+                var secs = document.querySelectorAll('section.section, section.section-card');
+                secs.forEach(ensureHeader);
+                // Re-run initAll for toggles if buttons were moved
+                if(window.initAll && typeof window.initAll === 'function') try{ window.initAll(); }catch(e){}
+            });
+        })();
+    </script>
+        <!-- Chatbot AI (added to index for toggleAIChat to find it) -->
+        <div id="aiChatbot" class="ai-chatbot">
+            <div class="ai-chat-header">
+                <span><i class="fas fa-robot ai-anim"></i> Asistente Inteligente</span>
+                <button class="ai-chat-close" type="button" data-onclick="toggleAIChat()">&times;</button>
+            </div>
+            <div class="ai-chat-body" id="aiChatBody">
+                <div class="ai-chat-msg ai-chat-msg-bot">¡Hola! Soy tu asistente inteligente 🤖. ¿En qué puedo ayudarte hoy?</div>
+            </div>
+            <form class="ai-chat-input" onsubmit="return sendAIMessage(event)">
+                <input type="text" id="aiChatInput" placeholder="Escribe tu pregunta..." autocomplete="off" />
+                <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            </form>
+            <div class="ai-chat-status" id="aiChatStatus">Pensando...</div>
+        </div>
+
+    <!-- Modal de diálogo reutilizable para confirmaciones y mensajes -->
+        <div id="modal-dialogo" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:100000;background:rgba(24,28,43,0.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:18px;">
+            <div id="modal-dialogo-content" style="background:linear-gradient(135deg,#f8f9ff 70%,#f0f4ff 100%);border-radius:18px;box-shadow:0 20px 60px rgba(102,126,234,0.3),0 4px 20px rgba(0,0,0,0.1);padding:20px 24px;max-width:840px;width:96vw;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;animation:fadeIn 0.28s;border:1px solid rgba(102,126,234,0.08);max-height:92vh;">
+        <button id="cerrar-modal-dialogo" aria-label="Cerrar" style="position:absolute;top:16px;right:20px;background:transparent;border:none;font-size:2rem;color:#667eea;cursor:pointer;font-weight:bold;transition:color 0.2s,transform 0.2s;z-index:2;padding:4px 8px;" onmouseover="this.style.color='#764ba2';this.style.transform='rotate(90deg)'" onmouseout="this.style.color='#667eea';this.style.transform='rotate(0deg)'">&times;</button>
+        <div id="modal-dialogo-icono" style="font-size:2.8rem;"></div>
+        <h2 id="modal-dialogo-titulo" style="color:#667eea;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:700;text-shadow:0 2px 12px rgba(102,126,234,0.1);margin-bottom:8px;text-align:center;"></h2>
+        <div id="modal-dialogo-mensaje" style="color:#2c3e50;font-size:1.06rem;text-align:left;margin-bottom:6px;line-height:1.5;width:100%;max-height:68vh;overflow:auto;padding-right:6px;box-sizing:border-box;"></div>
+        <div id="modal-dialogo-input-container" style="width:100%;display:none;flex-direction:column;align-items:center;gap:10px;">
+          <input id="modal-dialogo-input" type="text" style="width:90%;padding:12px 14px;border-radius:10px;border:2px solid #e0e7ff;font-size:1rem;font-family:'Poppins',sans-serif;transition:all 0.3s;" placeholder="Escribe aquí..." onmouseover="this.style.borderColor='#667eea'" onmouseout="this.style.borderColor='#e0e7ff'">
+        </div>
+        <div id="modal-dialogo-botones" style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;justify-content:center;z-index:3;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="container">
+        <!-- Logo grande editable antes del registro de productos -->
+        <div id="logo-box-container" style="width:100%;display:flex;justify-content:center;margin:32px 0 24px 0;">
+          <div id="logo-box" style="width:340px;height:340px;background:linear-gradient(135deg,#fffbe6 70%,#ffd8b0 100%);border-radius:36px;box-shadow:0 8px 32px #ffb88c55,0 2px 16px #ff980055;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:width 0.3s,height 0.3s;">
+            <!-- Asegúrate que las imágenes existan en la ruta indicada -->
+            <!-- Logo -->
+            <i class="fas fa-cubes" id="main-logo" style="font-size:120px; color:#43cea2; text-shadow: 0 4px 8px rgba(67, 206, 162, 0.3); margin: 20px 0;" title="Logo SAKORM'S"></i>
+            <!-- Botones ocultos por defecto -->
+            <div id="logo-btns" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:2;pointer-events:none;opacity:0;transition:opacity 0.3s;">
+              <input type="file" id="logo-input" accept="image/*" style="display:none;" />
+              <button id="btn-modificar" type="button" style="background:#ffb74d;color:#fffbe6;border:none;border-radius:8px;padding:8px 18px;font-size:1.08rem;font-weight:700;box-shadow:0 2px 8px #ffb88c55;cursor:pointer;pointer-events:auto;">Modificar</button>
+        <!-- Ajustes movidos al menú hamburguesa -->
+              <div style="display:flex;gap:8px;">
+                <button id="btn-guardar" type="button" style="background:#43cea2;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:1.05rem;font-weight:700;box-shadow:0 2px 8px #43cea255;cursor:pointer;pointer-events:auto;">Guardar</button>
+                <button id="btn-cancelar" type="button" style="background:#ff6f61;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:1.05rem;font-weight:700;box-shadow:0 2px 8px #ff6f6155;cursor:pointer;pointer-events:auto;">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nuevas Secciones Visuales -->
+        <main id="main-content" class="main-sections">
+          <section id="ventas" class="section-card">
+            <h2><i class="fas fa-receipt"></i> Ventas</h2>
+            <p>Registra y consulta las ventas realizadas.</p>
+            <button class="btn-section" data-onclick="mostrarSeccionVentas()">Ir a Ventas</button>
+          </section>
+          <section id="salidas" class="section-card">
+            <h2><i class="fas fa-sign-out-alt"></i> Salidas de Productos</h2>
+            <p>Gestiona las salidas de inventario y movimientos de productos.</p>
+            <button class="btn-section" data-onclick="mostrarSeccionSalidas()">Ir a Salidas</button>
+          </section>
+          <section id="clientes" class="section-card">
+            <h2><i class="fas fa-users"></i> Clientes</h2>
+            <p>Registra y administra tus clientes.</p>
+            <button class="btn-section" data-onclick="mostrarSeccionClientes()">Ir a Clientes</button>
+          </section>
+          <section id="proveedores" class="section-card">
+            <h2><i class="fas fa-handshake"></i> Proveedores</h2>
+            <p>Registra y administra tus proveedores.</p>
+            <button class="btn-section" data-onclick="mostrarSeccionProveedores()">Ir a Proveedores</button>
+          </section>
+        </main>
+
+        <!-- Registro de Productos -->
+        <section id="registro-productos" class="section">
+            <h2><i class="fas fa-plus-circle"></i> Registrar Producto</h2>
+            <form id="formulario-inventario" autocomplete="off">
+                <label for="codigo-producto"><i class="fas fa-barcode"></i> Código del Producto:</label>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="text" id="codigo-producto" placeholder="Ingrese el código del producto 📊" required style="flex:1;">
+                    <button type="button" id="btn-scan-code" title="Escanear código/QR" style="padding:8px 10px;border-radius:8px;border:none;background:#43cea2;color:#fff;cursor:pointer;"><i class="fas fa-qrcode"></i></button>
+                    <input type="file" id="scan-image-input" accept="image/*" capture="environment" style="display:none;">
+                </div>
+
+                <label for="nombre-producto"><i class="fas fa-tag"></i> Nombre del Producto:</label>
+                <input type="text" id="nombre-producto" placeholder="Ingrese el nombre del producto 📛" required>
+
+                <label for="categoria-producto"><i class="fas fa-list"></i> Categoría:</label>
+                <select id="categoria-producto" required>
+                    <option value="" disabled selected>Seleccione una categoría...</option>
+                </select>
+
+                <label for="cantidad-producto"><i class="fas fa-box"></i> Cantidad Inicial:</label>
+                <input type="number" id="cantidad-producto" placeholder="Ingrese la cantidad 📦" value="0" min="0" required>
+
+                <label for="precio-producto"><i class="fas fa-dollar-sign"></i> Precio del Producto:</label>
+                <input type="number" id="precio-producto" placeholder="Ingrese el precio 💲" step="0.01" min="0" required>
+
+                <label for="costo-producto"><i class="fas fa-coins"></i> Costo del Producto:</label>
+                <input type="number" id="costo-producto" placeholder="Ingrese el costo 💰" step="0.01" min="0" required>
+
+                <label for="fecha-caducidad"><i class="fas fa-hourglass-end"></i> Fecha de Caducidad:</label>
+                <div class="date-picker-container-expiry">
+                    <input type="date" id="fecha-caducidad" placeholder="Seleccione la fecha de caducidad" onfocus="this.showPicker ? this.showPicker() : this.click()" required>
+                    <span class="date-picker-icon" id="fecha-caducidad-icon" data-onclick="showDatePicker('fecha-caducidad')" style="cursor:pointer;" title="Abrir calendario">📅</span>
+                </div>
+
+                <label for="fecha-registro"><i class="fas fa-calendar-plus"></i> Fecha de Registro (Automática):</label>
+                <div class="date-picker-container">
+                    <input type="date" id="fecha-registro" placeholder="Se completa automáticamente" readonly>
+                    <span class="date-picker-icon">⏰</span>
+                </div>
+
+                <label for="imagen-producto"><i class="fas fa-image"></i> Imagen del Producto:</label>
+                <input type="file" id="imagen-producto" placeholder="Seleccione una imagen" accept="image/*">
+            </form>
+
+            <!-- Botón Agregar Producto -->
+            <button type="button" class="btn-agregar-producto" id="btn-agregar" data-onclick="agregarProducto()">
+                <i class="fas fa-plus-circle"></i> Agregar Producto ➕
+            </button>
+        </section>
+
+        <!-- Ajustes movidos al menú hamburguesa -->
+
+        <!-- Filtros -->
+        <section id="filtros" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-filter"></i> Filtros</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="filtros-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="filtros-content" class="section-content" style="max-height: none;">
+            <button id="btn-toggle-filtros" class="btn" type="button" data-onclick="toggleFiltros()" style="display: none;">Mostrar Filtros</button>
+            <div id="filtros-contenedor" style="display: block;">
+                <div class="filtros-container">
+                    <div class="filtro-seccion">
+                        <label for="filtro-nombre"><i class="fas fa-tag"></i> Nombre:</label>
+                        <input type="text" id="filtro-nombre" placeholder="🔍 Filtrar por nombre..." oninput="filtrarProductos()">
+
+                        <label for="filtro-categoria"><i class="fas fa-list"></i> Categoría:</label>
+                        <input type="text" id="filtro-categoria" placeholder="🔍 Filtrar por categoría..." oninput="filtrarProductos()">
+
+                        <label for="filtro-existencia"><i class="fas fa-sort-numeric-up"></i> Existencia Mínima:</label>
+                        <input type="number" id="filtro-existencia" placeholder="🔍 Cantidad mínima..." oninput="filtrarProductos()">
+                    </div>
+
+                    <div class="orden-seccion">
+                        <label for="orden-productos"><i class="fas fa-sort-alpha-down"></i> Ordenar por:</label>
+                        <select id="orden-productos" onchange="filtrarProductos()">
+                            <option value="nombre-asc">Nombre (A-Z)</option>
+                            <option value="nombre-desc">Nombre (Z-A)</option>
+                            <option value="existencia-asc">Existencia (Menor a Mayor)</option>
+                            <option value="existencia-desc">Existencia (Mayor a Menor)</option>
+                            <option value="fecha-registro">Fecha de Registro</option>
+                            <option value="fecha-caducidad">Fecha de Caducidad</option>
+                        </select>
+                    </div>
+
+                    <div class="botones-filtro">
+                        <button class="btn-limpiar" data-onclick="limpiarBusqueda()">
+                            <i class="fas fa-eraser"></i> Limpiar Filtros
+                        </button>
+                        <button class="btn-aplicar" data-onclick="filtrarProductos()">
+                            <i class="fas fa-check"></i> Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- Sección de Productos -->
+        <section id="productos" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-box"></i> Productos Registrados</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="productos-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="productos-content" class="section-content" style="max-height: none;">
+            <div class="table-container">
+                <!-- Botón de eliminar todo el inventario -->
+                <button id="btn-eliminar-todo" class="btn-eliminar" style="margin-bottom:16px;float:right;" data-onclick="confirmarEliminarTodo()">
+                    <i class="fas fa-trash"></i> Eliminar TODO el Inventario
+                </button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Cantidad</th>
+                            <th>Costo</th>
+                            <th>Precio</th>
+                            <th>Fecha Caducidad</th>
+                            <th>Fecha Registro</th>
+                            <th>Imagen</th>
+                            <th colspan="2" style="text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-body">
+                        <!-- Los productos se cargarán dinámicamente aquí -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <!-- Importar/Exportar -->
+        <section id="importar-exportar" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-file-import"></i> Importar y Exportar Archivos</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="importar-exportar-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="importar-exportar-content" class="section-content" style="max-height: none;">
+                <!-- Panel informativo -->
+                <div style="background: #e3f2fd; border-left: 4px solid #2196F3; color: #0d47a1; border-radius: 8px; padding: 16px 18px; margin-bottom: 24px; font-size: 1.05rem;">
+                    <strong>📋 Información:</strong>
+                    <ul style="margin: 10px 0 0 18px; padding: 0;">
+                        <li><strong>Exportar</strong>: Descarga tu inventario en Excel o PDF para análisis y respaldo</li>
+                        <li><strong>Importar</strong>: Carga datos desde archivos Excel o CSV (dirígete a la sección "Importar Inventario")</li>
+                        <li>Los archivos exportados incluyen: Código, Nombre, Categoría, Cantidad, Costo, Precio y Ganancia</li>
+                    </ul>
+                </div>
+
+                <!-- Sección de Exportación -->
+                <h3 style="color: #ff9800; margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-download"></i> Exportar Mi Inventario
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px;">
+                    <!-- Exportar Excel -->
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); color: white; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 12px;">📊</div>
+                        <h4 style="margin: 0 0 10px 0; font-size: 1.2rem;">Exportar Excel</h4>
+                        <p style="margin: 0 0 16px 0; font-size: 0.95rem; opacity: 0.95;">Descarga todos tus productos en formato Excel</p>
+                        <button data-onclick="exportarExcel()" class="btn" style="background: white; color: #10b981; border: none; padding: 10px 24px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;">
+                            <i class="fas fa-download"></i> Descargar Excel
+                        </button>
+                    </div>
+
+                    <!-- Exportar PDF -->
+                    <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); color: white; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 12px;">📄</div>
+                        <h4 style="margin: 0 0 10px 0; font-size: 1.2rem;">Exportar PDF</h4>
+                        <p style="margin: 0 0 16px 0; font-size: 0.95rem; opacity: 0.95;">Genera reporte profesional de tu inventario</p>
+                        <button data-onclick="exportarPDF()" class="btn" style="background: white; color: #ef4444; border: none; padding: 10px 24px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;">
+                            <i class="fas fa-download"></i> Descargar PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sección de Importación -->
+                <h3 style="color: #ff9800; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-upload"></i> Importar Inventario
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px;">
+                    <!-- Importar Excel -->
+                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); color: white; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 12px;">📥</div>
+                        <h4 style="margin: 0 0 10px 0; font-size: 1.2rem;">Importar Excel/CSV</h4>
+                        <p style="margin: 0 0 16px 0; font-size: 0.95rem; opacity: 0.95;">Carga archivos .xlsx, .xls o .csv con tus productos</p>
+                        <button data-onclick="importarExcel()" class="btn" style="background: white; color: #3b82f6; border: none; padding: 10px 24px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;">
+                            <i class="fas fa-upload"></i> Importar Archivo
+                        </button>
+                    </div>
+
+                    <!-- Importar PDF (No soportado) -->
+                    <div style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(156, 163, 175, 0.25); color: white; text-align: center; opacity: 0.7;">
+                        <div style="font-size: 2.5rem; margin-bottom: 12px;">🚫</div>
+                        <h4 style="margin: 0 0 10px 0; font-size: 1.2rem;">Importar PDF</h4>
+                        <p style="margin: 0 0 16px 0; font-size: 0.95rem; opacity: 0.95;">No soportado - Usa Excel o CSV</p>
+                        <button data-onclick="importarPDF()" class="btn" style="background: white; color: #9ca3af; border: none; padding: 10px 24px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: not-allowed;" disabled>
+                            <i class="fas fa-ban"></i> No Disponible
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resumen -->
+                <div style="background: #fff8e1; border: 2px solid #fbc02d; border-radius: 8px; padding: 16px 18px; margin-top: 20px;">
+                    <strong style="color: #f57f17;">💡 Recomendaciones:</strong>
+                    <ul style="margin: 10px 0 0 18px; padding: 0; color: #c49000;">
+                        <li>Exporta tu inventario regularmente para mantener respaldos</li>
+                        <li>Los reportes PDF son ideales para presentaciones y auditorías</li>
+                        <li>Para importar nuevos productos, descarga la plantilla en la sección "Importar Inventario"</li>
+                        <li>Mantén un registro de exportaciones para histórico de datos</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cargar Nuevos Productos -->
+        <section id="ejemplo-tabla" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-plus-circle"></i> Cargar Nuevos Productos</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="ejemplo-tabla-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="ejemplo-tabla-content" class="section-content" style="max-height: none;">
+                <!-- Indicaciones principales -->
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left: 4px solid #1976d2; color: #0d47a1; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; font-size: 1.05rem; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);">
+                    <strong style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <i class="fas fa-lightbulb"></i> Instrucciones para Cargar Productos
+                    </strong>
+                    <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                        <li>Descarga la plantilla <strong>Excel o CSV</strong> usando los botones de abajo</li>
+                        <li>Abre el archivo en Excel, Calc o cualquier editor de hojas de cálculo</li>
+                        <li>Llena tus productos con los datos exactos (respeta las columnas y el orden)</li>
+                        <li><strong style="color: #c62828;">Campos obligatorios:</strong> Código, Nombre, Cantidad, Costo, Precio, Fecha Caducidad, Categoría</li>
+                        <li>Guarda el archivo con el mismo formato (Excel o CSV)</li>
+                        <li>Sube el archivo usando el formulario "Cargar Archivo de Inventario"</li>
+                        <li>Revisa la <strong>vista previa</strong> de tus datos antes de confirmar</li>
+                        <li>¡Confirma la importación y tus productos se cargarán automáticamente!</li>
+                    </ol>
+                </div>
+
+                <!-- Botones de Descarga de Plantilla -->
+                <div style="margin-bottom: 28px;">
+                    <h3 style="color: #ff9800; margin-top: 0; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-download"></i> Paso 1: Descargar Plantilla
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <button class="btn" data-onclick="descargarPlantillaExcel()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            <i class="fas fa-file-excel"></i> Descargar Excel
+                        </button>
+                        <button class="btn" data-onclick="descargarPlantillaCSV()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            <i class="fas fa-file-csv"></i> Descargar CSV
+                        </button>
+                        <button id="btn-tabla-ejemplo" class="btn" data-onclick="toggleTablaEjemplo()" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                            <i class="fas fa-eye"></i> Ver Tabla de Ejemplo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Ejemplo -->
+                <div id="tabla-ejemplo" style="display: none; background: #fafafa; border-radius: 8px; padding: 18px; margin-bottom: 28px; border: 2px solid #ff9800;">
+                    <h4 style="color: #ff9800; margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-table"></i> Ejemplo de Estructura
+                    </h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+                            <thead>
+                                <tr style="background: #ff9800; color: white;">
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Código</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Nombre</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Cantidad</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Costo</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Precio</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Fecha Caducidad</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #ffb84d;">Categoría</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fff;">
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;"><strong>PROD001</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">Laptop Dell</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: center;">5</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: right;">800.00</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: right;">1200.00</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">2026-12-31</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">Electrónica</td>
+                                </tr>
+                                <tr style="background: #f9f9f9;">
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;"><strong>PROD002</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">Mouse Logitech</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: center;">20</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: right;">15.00</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: right;">35.00</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">2026-06-30</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">Accesorios</td>
+                                </tr>
+                                <tr style="background: #fff;">
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;"><strong>PROD003</strong></td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">Teclado Mecánico</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: center;">10</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: right;">60.00</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d; text-align: right;">120.00</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">2027-12-31</td>
+                                    <td style="padding: 10px; border: 1px solid #ffb84d;">Accesorios</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Área de Carga e Importación -->
+                <div style="background: linear-gradient(135deg, #fffbe6 70%, #ffd8b0 100%); border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2); border: 2px solid #ffb74d;">
+                    <h3 style="color: #ff9800; margin-top: 0; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; font-size: 1.2rem;">
+                        <i class="fas fa-cloud-upload-alt"></i> Paso 2: Cargar Archivo de Inventario
+                    </h3>
+                    
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;">
+                        <div style="flex: 1; min-width: 280px;">
+                            <label for="archivo-importar" style="display: block; margin-bottom: 10px; font-weight: 700; color: #e65100; font-size: 1.05rem;">
+                                📁 Selecciona tu archivo:
+                            </label>
+                            <input type="file" id="archivo-importar" accept=".xlsx,.xls,.csv" style="width: 100%; padding: 14px; border: 3px dashed #ff9800; border-radius: 8px; font-size: 1rem; background: white; cursor: pointer; transition: all 0.3s;" title="Selecciona un archivo Excel o CSV">
+                        </div>
+                        <button data-onclick="importarInventarioDesdeArchivo()" class="btn" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 14px 28px; display: flex; align-items: center; gap: 8px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);">
+                            <i class="fas fa-upload"></i> Importar Productos
+                        </button>
+                    </div>
+                    <p style="color: #e65100; font-size: 0.95rem; margin-top: 14px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-info-circle"></i> <strong>Formatos soportados:</strong> .xlsx, .xls, .csv | <strong>Tamaño máximo:</strong> 5 MB
+                    </p>
+                </div>
+
+                <!-- Notas importantes -->
+                <div style="background: #fff3e0; border-left: 4px solid #ff6f00; border-radius: 8px; padding: 16px 18px;">
+                    <strong style="display: flex; align-items: center; gap: 8px; color: #e65100; margin-bottom: 8px;">
+                        <i class="fas fa-exclamation-triangle"></i> Notas Importantes
+                    </strong>
+                    <ul style="margin: 0; padding-left: 20px; color: #bf360c; line-height: 1.7;">
+                        <li>Las <strong>fechas</strong> deben estar en formato <strong>YYYY-MM-DD</strong> (ej: 2026-12-31)</li>
+                        <li>Los <strong>precios</strong> deben usar punto decimal (ej: 99.99, no 99,99)</li>
+                        <li>La <strong>categoría</strong> debe existir en el sistema o será creada automáticamente</li>
+                        <li>Los datos se <strong>verificarán</strong> antes de importar, con reporte de errores</li>
+                        <li>Si hay errores, se mostrarán detalles específicos para cada fila</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registro de Categorías -->
+        <section id="registro-categorias" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-list"></i> Registro de Categorías</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="registro-categorias-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="registro-categorias-content" class="section-content" style="max-height: none;">
+                <form id="formulario-categorias" autocomplete="off">
+                    <label for="nueva-categoria"><i class="fas fa-plus-circle"></i> Nueva Categoría:</label>
+                    <input type="text" id="nueva-categoria" placeholder="Ingrese una nueva categoría...">
+                    <button type="button" class="btn-agregar" data-onclick="agregarCategoria()">
+                        <i class="fas fa-plus"></i> Agregar Categoría
+                    </button>
+                </form>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-categorias">
+                            <!-- Categorías dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- API Ejemplo eliminado del layout (referencias y código asociado removidos) -->
+
+        <!-- Registro de Clientes -->
+        <section id="registro-clientes" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-users"></i> Registro de Clientes</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="registro-clientes-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="registro-clientes-content" class="section-content" style="max-height: none;">
+            <form id="formulario-clientes" autocomplete="off" onsubmit="agregarClienteForm(event)">
+                <label for="cliente-nombre"><i class="fas fa-user"></i> Nombre del Cliente:</label>
+                <input type="text" id="cliente-nombre" placeholder="Nombre completo" required>
+
+                <label for="cliente-email"><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" id="cliente-email" placeholder="correo@ejemplo.com" required>
+
+                <label for="cliente-telefono"><i class="fas fa-phone"></i> Teléfono:</label>
+                <input type="tel" id="cliente-telefono" placeholder="+52 555 1234567">
+
+                <button type="submit" class="btn-agregar">
+                    <i class="fas fa-plus-circle"></i> Agregar Cliente
+                </button>
+            </form>
+            <div class="table-container">
+                <h3>Clientes Registrados</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-clientes">
+                        <!-- Clientes dinámicos -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <!-- Registro de Proveedores -->
+        <section id="registro-proveedores" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-truck"></i> Registro de Proveedores</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="registro-proveedores-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="registro-proveedores-content" class="section-content" style="max-height: none;">
+            <form id="formulario-proveedores" autocomplete="off" onsubmit="agregarProveedorForm(event)">
+                <label for="proveedor-nombre"><i class="fas fa-building"></i> Nombre del Proveedor:</label>
+                <input type="text" id="proveedor-nombre" placeholder="Nombre de la empresa" required>
+
+                <label for="proveedor-email"><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" id="proveedor-email" placeholder="contacto@proveedor.com" required>
+
+                <label for="proveedor-telefono"><i class="fas fa-phone"></i> Teléfono:</label>
+                <input type="tel" id="proveedor-telefono" placeholder="+52 555 1234567">
+
+                <button type="submit" class="btn-agregar">
+                    <i class="fas fa-plus-circle"></i> Agregar Proveedor
+                </button>
+            </form>
+            <div class="table-container">
+                <h3>Proveedores Registrados</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-proveedores">
+                        <!-- Proveedores dinámicos -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <!-- Registro de Ventas -->
+        <section id="registro-ventas" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-money-bill-wave"></i> Registro de Ventas</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="registro-ventas-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="registro-ventas-content" class="section-content" style="max-height: none;">
+            <form id="formulario-ventas" autocomplete="off" onsubmit="agregarVentaForm(event)">
+                <label for="venta-cliente"><i class="fas fa-user-circle"></i> Cliente:</label>
+                <select id="venta-cliente" required>
+                    <option value="" disabled selected>Selecciona un cliente...</option>
+                </select>
+
+                <label for="venta-total"><i class="fas fa-dollar-sign"></i> Total de la Venta:</label>
+                <input type="number" id="venta-total" placeholder="0.00" step="0.01" min="0" required>
+
+                <label for="venta-fecha"><i class="fas fa-calendar-alt"></i> Fecha de Venta:</label>
+                <input type="date" id="venta-fecha" required>
+
+                <button type="submit" class="btn-agregar">
+                    <i class="fas fa-plus-circle"></i> Registrar Venta
+                </button>
+            </form>
+            <div class="table-container">
+                <h3>Ventas Registradas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente ID</th>
+                            <th>Total</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-ventas">
+                        <!-- Ventas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <!-- Registro de Salidas -->
+        <section id="registro-salidas" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-sign-out-alt"></i> Registro de Salidas de Productos</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="registro-salidas-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="registro-salidas-content" class="section-content" style="max-height: none;">
+            <form id="formulario-salidas" autocomplete="off" onsubmit="agregarSalidaForm(event)">
+                <label for="salida-producto"><i class="fas fa-box"></i> Producto:</label>
+                <select id="salida-producto" required>
+                    <option value="" disabled selected>Selecciona un producto...</option>
+                </select>
+
+                <label for="salida-cantidad"><i class="fas fa-cubes"></i> Cantidad:</label>
+                <input type="number" id="salida-cantidad" placeholder="0" min="1" required>
+
+                <label for="salida-fecha"><i class="fas fa-calendar-alt"></i> Fecha de Salida:</label>
+                <input type="date" id="salida-fecha" required>
+
+                <button type="submit" class="btn-agregar">
+                    <i class="fas fa-plus-circle"></i> Registrar Salida
+                </button>
+            </form>
+            <div class="table-container">
+                <h3>Salidas Registradas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Fecha de Salida</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-salidas">
+                        <!-- Salidas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <!-- Contacto -->
+        <section id="contacto" class="section">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;">
+                <h2 style="margin: 0;"><i class="fas fa-envelope"></i> Contacto 📧</h2>
+                <button class="btn-toggle-section" type="button" aria-expanded="true" aria-controls="contacto-content" style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-up"></i> Ocultar
+                </button>
+            </div>
+            <div id="contacto-content" class="section-content" style="max-height: none;">
+            <div class="contacto-container">
+              <p><i class="fas fa-building"></i> <strong>Empresa:</strong> SAKORM`S-IT 🏢</p>
+              <p><i class="fas fa-envelope"></i> <strong>Correo:</strong> <a href="mailto:omarreyes7375@gmail.com">omarreyes7375@gmail.com</a></p>
+              <p><i class="fab fa-whatsapp"></i> <strong>WhatsApp:</strong> <a href="https://wa.me/5549130325" target="_blank" rel="noopener">5549130325</a></p>
+              <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> Ciudad de México, México 📍</p>
+            </div>
+            <div class="contact-form-container ai-contact-form">
+              <h3><i class="fas fa-envelope-open-text"></i> Envíanos un mensaje ✉️</h3>
+              <form id="contact-form" autocomplete="off" aria-label="Formulario de contacto">
+                <label for="nombre-contacto"><i class="fas fa-user"></i> Nombre:</label>
+                <input type="text" id="nombre-contacto" name="nombre-contacto" placeholder="👤 Ingrese su nombre completo" required autocomplete="name" aria-required="true">
+
+                <label for="correo-contacto"><i class="fas fa-envelope"></i> Correo Electrónico:</label>
+                <input type="email" id="correo-contacto" name="correo-contacto" placeholder="📧 Ingrese su correo electrónico" required autocomplete="email" aria-required="true">
+
+                <label for="telefono-contacto"><i class="fas fa-phone"></i> Teléfono:</label>
+                <input type="tel" id="telefono-contacto" name="telefono-contacto" placeholder="📞 Ingrese su número de teléfono" pattern="[0-9+\s\-()]{7,20}" autocomplete="tel">
+
+                <label for="mensaje-contacto"><i class="fas fa-comment-dots"></i> Mensaje:</label>
+                <textarea id="mensaje-contacto" name="mensaje-contacto" rows="4" placeholder="💬 Escriba su mensaje aquí..." required aria-required="true"></textarea>
+
+                <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Enviar Mensaje 🚀</button>
+              </form>
+            </div>
+            </div>
+        </section>
+
+    </div> <!-- Cierre de .container -->
+
+
+    
+    <!-- Modal de Calculadora -->
+    <div id="calculatorModal" class="calculator-modal">
+      <div class="calculator-container">
+                    <div class="calculator-header">
+                    <h2>🧮 Calculadora</h2>
+                    <button type="button" class="calc-close" data-onclick="toggleCalculator()">&times;</button>
+                </div>
+        <div class="calculator">
+          <input type="text" id="calcDisplay" class="calc-display" readonly value="0">
+          <div class="calc-buttons">
+            <button class="calc-btn calc-func" data-onclick="calcClear()">C</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('/')">/</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('*')">×</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('-')">−</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('7')">7</button>
+            <button class="calc-btn" data-onclick="calcPress('8')">8</button>
+            <button class="calc-btn" data-onclick="calcPress('9')">9</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('+')">+</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('4')">4</button>
+            <button class="calc-btn" data-onclick="calcPress('5')">5</button>
+            <button class="calc-btn" data-onclick="calcPress('6')">6</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('.')">.</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('1')">1</button>
+            <button class="calc-btn" data-onclick="calcPress('2')">2</button>
+            <button class="calc-btn" data-onclick="calcPress('3')">3</button>
+            <button class="calc-btn calc-equal" data-onclick="calcEquals()" style="grid-row: span 2;">=</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('0')" style="grid-column: span 2;">0</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+        <!-- Duplicate AI chatbot removed to ensure unique IDs on page -->
+    <!-- Modal de confirmación de eliminación masiva -->
+    <div id="modal-eliminacion-todo" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;background:rgba(255,184,140,0.18);backdrop-filter:blur(2px);align-items:center;justify-content:center;">
+      <div style="background:linear-gradient(135deg,#fffbe6 70%,#ffd8b0 100%);border-radius:28px;box-shadow:0 8px 32px #ffb88c77,0 2px 16px #ff980055;padding:36px 38px 28px 38px;max-width:420px;width:90vw;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;">
+        <button id="cerrar-modal-eliminacion-todo" aria-label="Cerrar" style="position:absolute;top:12px;right:16px;background:transparent;border:none;font-size:1.6rem;color:#ff9800;cursor:pointer;font-weight:bold;transition:color 0.2s;z-index:2;">&times;</button>
+        <h2 style="color:#ff6f61;font-size:1.7rem;font-family:'Montserrat','Poppins',sans-serif;font-weight:900;text-shadow:0 2px 12px #ffecd2cc;margin-bottom:8px;text-align:center;">¡Inventario eliminado!</h2>
+        <p style="color:#a65c00;font-size:1.18rem;text-align:center;margin-bottom:6px;">Todos los productos han sido eliminados correctamente.<br>Esta acción no se puede deshacer.</p>
+      </div>
+    </div>
+    <!-- <script src="main.js" type="module" defer></script> -->
+
+    <!-- Footer profesional UX/UI -->
+    <footer class="main-footer" style="background: linear-gradient(90deg, #4CAF50 0%, #2196F3 100%); color: #fff; border-radius: 18px 18px 0 0; box-shadow: 0 -4px 24px #2196F355; margin-top: 48px; padding: 0;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 32px; padding: 36px 8vw 18px 8vw; border-bottom: 1.5px solid #fff3e055;">
+        <div style="display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 700;">
+          <span style="font-size: 2.2rem; color: #fffbe6; background: #ff9800; border-radius: 50%; padding: 8px 12px; margin-right: 6px; box-shadow: 0 2px 8px #ffb88c99;">
+            <i class="fas fa-cube"></i>
+          </span>
+          <span style="font-size: 1.3rem; font-weight: 900; letter-spacing: 1.2px;">SAKORM'S Inventory</span>
+        </div>
+        <nav style="display: flex; flex-direction: column; gap: 8px; min-width: 120px;">
+          <a href="#" style="color: #fffbe6; text-decoration: none; font-size: 1.08rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fas fa-home"></i> Inicio</a>
+          <a href="#" style="color: #fffbe6; text-decoration: none; font-size: 1.08rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fas fa-headset"></i> Soporte</a>
+          <a href="#" style="color: #fffbe6; text-decoration: none; font-size: 1.08rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fas fa-question-circle"></i> Ayuda</a>
+          <a href="#" style="color: #fffbe6; text-decoration: none; font-size: 1.08rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fas fa-user-shield"></i> Privacidad</a>
+        </nav>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 1.05rem;">
+          <span><i class="fas fa-envelope"></i> contacto@sakorms.org</span>
+          <span><i class="fas fa-phone"></i> +52 55 4913 0325</span>
+        </div>
+        <div style="display: flex; gap: 18px; margin-top: 8px;">
+          <a href="https://wa.me/5549130325" target="_blank" title="WhatsApp" style="color: #fffbe6; font-size: 1.5rem;"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" title="Facebook" style="color: #fffbe6; font-size: 1.5rem;"><i class="fab fa-facebook"></i></a>
+          <a href="#" title="Twitter" style="color: #fffbe6; font-size: 1.5rem;"><i class="fab fa-twitter"></i></a>
+          <a href="#" title="Instagram" style="color: #fffbe6; font-size: 1.5rem;"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div style="text-align: center; font-size: 1.02rem; color: #fffbe6; background: rgba(33,150,243,0.13); padding: 12px 0 10px 0; letter-spacing: 0.5px;">
+        &copy; 2025 SAKORM'S-IT. Todos los derechos reservados. | <a href="#" style="color: #fffbe6; text-decoration: underline; font-weight: 600;">Términos y condiciones</a>
+      </div>
+    </footer>
+    <script>
+      (function initWelcome() {
+        let timer = 40;
+        let interval = null;
+        
+        function closeWelcome() {
+          const welcomeDialog = document.getElementById('welcome-dialog');
+          if (welcomeDialog) {
+            welcomeDialog.style.display = 'none';
+            welcomeDialog.style.visibility = 'hidden';
+            welcomeDialog.style.opacity = '0';
+            welcomeDialog.style.pointerEvents = 'none';
+          }
+          if (interval) {
+            clearInterval(interval);
+          }
+        }
+        
+        function startTimer() {
+          const welcomeTimer = document.getElementById('welcome-timer');
+          const welcomeDialog = document.getElementById('welcome-dialog');
+          const closeWelcomeBtn = document.getElementById('close-welcome');
+          
+          // Guardar la función closeWelcome en el botón para acceso directo
+          if (closeWelcomeBtn) {
+            closeWelcomeBtn.__closeWelcome = closeWelcome;
+          }
+          
+          // Iniciar el intervalo del temporizador
+          interval = setInterval(() => {
+            timer--;
+            if (welcomeTimer) {
+              welcomeTimer.textContent = `Este mensaje se cerrará en ${timer} segundos...`;
+            }
+            if (timer <= 0) {
+              closeWelcome();
+            }
+          }, 1000);
+          
+          // Manejador para el botón de cerrar
+          if (closeWelcomeBtn) {
+            closeWelcomeBtn.onclick = function(e) {
+              if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+              closeWelcome();
+            };
+          }
+          
+          // Manejador para cerrar al hacer click en el overlay
+          if (welcomeDialog) {
+            welcomeDialog.onclick = function(e) {
+              if (e.target === welcomeDialog) {
+                closeWelcome();
+              }
+            };
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', startTimer);
+        } else {
+          startTimer();
+        }
+      })();
+    </script>
+
+        <!-- Test SQL Server button removed -->
+</body>
+</html>

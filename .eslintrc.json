@@ -1,0 +1,57 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "globals": {
+    "UI": "writable",
+    "safeWarn": "readonly",
+    "$id": "readonly",
+    "showNotification": "readonly",
+    "initGoogleLogin": "readonly",
+    "initFacebookLogin": "readonly",
+    "initTwitterLogin": "readonly",
+    "initInstagramLogin": "readonly",
+    "FB": "readonly",
+    "handleSocialLoginResponse": "readonly",
+    "generateRandomState": "readonly",
+    "generateCodeChallenge": "readonly",
+    "buildApiUrl": "readonly",
+    "redirectTo": "readonly",
+    "mostrarLogin": "readonly",
+    "mostrarRecuperar": "readonly",
+    "generateIdFromString": "readonly",
+    "prepareRegisterForm": "readonly",
+    "AI": "readonly",
+    "getChat": "readonly",
+    "getChatBody": "readonly",
+    "editarProducto": "readonly",
+    "cargarProductos": "readonly",
+    "resaltarSeccion": "readonly",
+    "eliminarRegistro": "readonly",
+    "XLSX": "readonly",
+    "Calculator": "readonly",
+    "CategoriasAPI": "readonly",
+    "ProductosAPI": "readonly",
+    "ClientesAPI": "readonly",
+    "ProveedoresAPI": "readonly",
+    "VentasAPI": "readonly",
+    "SalidasAPI": "readonly",
+    "window": "readonly",
+    "document": "readonly",
+    "location": "readonly",
+    "navigator": "readonly"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "args": "none", "varsIgnorePattern": "^_" }],
+    "no-undef": "error",
+    "no-global-assign": ["error", { "exceptions": ["UI"] }],
+    "no-console": "off",
+    "eqeqeq": ["warn", "always"]
+  }
+}

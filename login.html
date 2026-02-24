@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Inicio de sesión">
+    <meta name="keywords" content="Login, Usuarios, Inventario">
+    <meta name="author" content="SAKORMS-IT">
+    <title>Inicio de Sesión</title>
+    <base id="site-base" href="/Sakorms.org/Inventory-web1.5/">
+    <script>
+      (function(){
+        try{
+          var be = document.getElementById('site-base');
+          if (!be) return;
+          var p = location.pathname || '/';
+          var parts = p.split('/').filter(function(x){ return !!x; });
+          if (parts.length && parts[parts.length-1].indexOf('.') !== -1) parts.pop();
+          var basePath = '/' + parts.join('/') + (parts.length ? '/' : '');
+          // Only override the default base when we detect the project folder in the path
+          if (basePath.indexOf('/Inventory-web1.5') !== -1) {
+            be.setAttribute('href', basePath);
+            console.info('Base href ajustada dinámicamente a', basePath);
+          } else {
+            console.info('Base href not changed (kept default):', be.getAttribute('href'));
+          }
+        } catch(e) { console.warn('base resolve failed', e); }
+      })();
+    </script>
+
+    <script>
+      // Fallback loader: normalize and (re)inject assets if path resolution caused 404s
+      (function(){
+        function resolve(p){ try { return new URL(p, document.baseURI).href; } catch(e){ return p; } }
+        function injectLink(href){ var l = document.createElement('link'); l.rel='stylesheet'; l.href = href; l.onerror = function(){ console.warn('CSS load failed', href); }; document.head.appendChild(l); }
+        function injectScript(src, defer){ var s = document.createElement('script'); if(defer) s.defer = true; s.src = src; s.onerror = function(){ console.warn('Script load failed', src); }; document.head.appendChild(s); }
+
+        // Assets to ensure (order matters for some scripts)
+        var cssAssets = ['app.css','login.css'];
+        var jsAssets = ['js/inline-handler-polyfill.js','js/data-onclick-wrappers.js','js/config.js','js/ui.js','js/calculator.js','js/auth.js','js/ai.js','js/test.js','js/helpers.js','login.js'];
+
+        // If any stylesheet link with a matching filename is not present, inject resolved link
+        cssAssets.forEach(function(name){
+          var found = Array.from(document.querySelectorAll('link[rel=stylesheet]')).some(function(l){ return l.href && l.href.indexOf(name) !== -1; });
+          if (!found) injectLink(resolve(name));
+        });
+
+        // Inject scripts idempotently: if a script with same filename not found, append it
+        jsAssets.forEach(function(name){
+          var found = Array.from(document.querySelectorAll('script[src]')).some(function(s){ return s.src && s.src.indexOf(name) !== -1; });
+          if (!found) {
+            // place non-deferred scripts immediately, others deferred
+            var deferred = name.indexOf('inline-handler-polyfill') === -1 && name.indexOf('data-onclick-wrappers') !== -1;
+            injectScript(resolve(name), deferred);
+          }
+        });
+
+        // After a short delay, if core globals are still missing, attempt to reload ui/login explicitly
+        setTimeout(function(){
+          try{
+            if (typeof window.UI === 'undefined') { injectScript(resolve('js/ui.js'), true); }
+            if (typeof validarLogin === 'undefined') { injectScript(resolve('login.js'), true); }
+          }catch(e){ console.warn('fallback loader failed', e); }
+        }, 300);
+      })();
+    </script>
+    <!-- CSS principal y personalizados -->
+    <link rel="stylesheet" href="/Sakorms.org/Inventory-web1.5/app.css?t=20260130000000">
+    <link rel="stylesheet" href="/Sakorms.org/Inventory-web1.5/login.css?t=20260130000000">
+    <!-- Fix: ensure inputs/tables remain readable when AI enhance mode is toggled -->
+    <style id="ai-enhance-fix">
+      body.ai-enhanced input,
+      body.ai-enhanced textarea,
+      body.ai-enhanced select,
+      body.ai-enhanced .login-card input,
+      body.ai-enhanced .login-main input,
+      body.ai-enhanced .login-container input,
+      body.ai-enhanced .input-with-btn input,
+      body.ai-enhanced .modal-content input,
+      body.ai-enhanced .dialog input,
+      body.ai-enhanced table,
+      body.ai-enhanced th,
+      body.ai-enhanced td,
+      body.ai-enhanced .table-container td {
+        background: linear-gradient(180deg,#071026,#0b1220) !important;
+        color: #eaf4ff !important;
+        border-color: rgba(255,255,255,0.06) !important;
+        box-shadow: none !important;
+      }
+      body.ai-enhanced input::placeholder,
+      body.ai-enhanced textarea::placeholder {
+        color: rgba(234,244,255,0.75) !important;
+        opacity: 1 !important;
+      }
+    </style>
+    <!-- Nota: custom.css y style.css han sido consolidados en app.css -->
+    <script>
+      // Diagnostic: log CSS var for debugging without changing styles
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          const v = (getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || '').trim();
+          console.info('🔍 (login) CSS var --color-primary ->', v || '(empty)');
+        } catch (e) {
+          console.warn('Unable to read CSS variables on login page', e);
+        }
+      });
+    </script>
+    
+    <!-- Fuentes y librerías externas -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Poppins:400,700|Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+      :root{--accent:#6c5ce7;--accent-2:#00d4ff;--neon:#43f0ff}
+      .neon-line-strong{height:3px;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--neon),var(--accent-2));box-shadow:0 6px 30px rgba(108,92,231,0.12),0 0 24px rgba(67,240,255,0.06);margin:12px 0 18px 0}
+      .animate-in{animation:cardIn .6s cubic-bezier(.2,.9,.2,1) both}
+      @keyframes cardIn{from{transform:translateY(18px) scale(.995);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+      .logo-float{animation:floaty 6s ease-in-out infinite}
+      @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+      /* Extra small UX improvements for login page */
+      .btn-login { box-shadow: 0 8px 24px rgba(255,111,97,0.12); transition: transform .18s ease, box-shadow .18s ease, background .18s; }
+      .btn-login:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 18px 46px rgba(255,111,97,0.18); }
+      .input-hint { font-size:0.92rem;color:rgba(10,18,32,0.6); }
+      .pulse-emoji { display:inline-block; animation: pulse 1.6s infinite alternate; }
+      @keyframes pulse { from { transform: translateY(0); } to { transform: translateY(-4px) scale(1.06); } }
+      .login-card h2 i { margin-right:8px; transform:translateY(2px); }
+    </style>
+</head>
+<body>
+    <!-- Cuadro de diálogo de bienvenida -->
+    <div id="welcome-dialog" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(255,184,140,0.18);backdrop-filter:blur(2px);pointer-events:none;">
+      <div style="pointer-events:auto;background:linear-gradient(135deg,#fffbe6 70%,#ffd8b0 100%);border-radius:28px;box-shadow:0 8px 32px #ffb88c77,0 2px 16px #ff980055;padding:36px 38px 28px 38px;max-width:480px;width:90vw;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;">
+        <button id="close-welcome" aria-label="Cerrar bienvenida" style="position:absolute;top:12px;right:16px;background:transparent;border:none;font-size:1.6rem;color:#ff9800;cursor:pointer;font-weight:bold;transition:color 0.2s;z-index:2;">&times;</button>
+        <h1 style="color:#ff9800;font-size:2.1rem;font-family:'Montserrat','Poppins',sans-serif;font-weight:900;text-shadow:0 2px 12px #ffecd2cc;margin-bottom:8px;text-align:center;">
+          ¡Bienvenido a SAKORM'S Inventory!
+        </h1>
+        <p style="color:#a65c00;font-size:1.18rem;text-align:center;margin-bottom:6px;">
+          Gestiona tu inventario de manera sencilla, segura y eficiente.<br>
+          <span style="color:#ff6f61;font-weight:600;">Sigue las instrucciones para iniciar sesión, crear una cuenta o recuperar tu acceso.</span>
+        </p>
+        <ul style="color:#a65c00;font-size:1.05rem;text-align:left;list-style:disc inside;margin:0 0 0 10px;padding:0;">
+          <li>Ingresa tu correo y contraseña para acceder.</li>
+          <li>¿No tienes cuenta? Haz clic en <b>Crear cuenta nueva</b>.</li>
+          <li>¿Olvidaste tu contraseña? Usa <b>¿Olvidaste tu contraseña?</b> para recuperarla.</li>
+          <li>Puedes usar el acceso rápido con Google, Facebook, Twitter o Instagram.</li>
+          <li>Para ayuda adicional, revisa la sección de <b>Ayuda</b> o contáctanos.</li>
+        </ul>
+        <span id="welcome-timer" style="color:#ff9800;font-size:0.98rem;margin-top:10px;">Este mensaje se cerrará en 25 segundos...</span>
+      </div>
+    </div>
+    
+    <!-- Floating Action Buttons (copiados desde index.html) -->
+    <div id="floating-buttons-wrapper" style="position:fixed;bottom:20px;right:20px;z-index:10002;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto;">
+        <!-- Asistente Virtual (AI) - Primero -->
+          <button class="fab-btn fab-ai" id="btnAIChat" title="Asistente Virtual 🤖 (Ayuda en línea)" aria-label="Abrir asistente virtual"
+                    style="width:70px;height:70px;background:linear-gradient(135deg,#ffb74d 0%,#ff9800 100%);color:#fff;box-shadow:0 0 0 4px #fffbe6,0 8px 28px rgba(255,152,0,0.3);font-size:2.3rem;border-radius:50%;transition:box-shadow 0.2s,transform 0.2s;outline:3px solid #ff9800;outline-offset:2px;">
+          <i class="fas fa-robot"></i>
+        </button>
+        <!-- Calculadora - Segundo -->
+        <button class="fab-btn fab-calc" id="btnCalc" title="Calculadora" aria-label="Abrir calculadora"
+          style="width:64px;height:64px;background:linear-gradient(135deg,#fffbe6 0%,#ffe0c3 100%);color:#ff9800;box-shadow:0 8px 28px rgba(255,183,77,0.3);font-size:2rem;border:3px solid #ff9800;border-radius:50%;transition:background 0.2s,transform 0.2s;">
+          <i class="fas fa-calculator"></i>
+        </button>
+        <!-- Mejorar con AI - Tercero -->
+        <button class="fab-btn fab-ai" id="btnAIEnhance" title="Mejorar con AI ✨" aria-label="Mejorar con AI"
+          style="width:64px;height:64px;background:linear-gradient(135deg,#00f0ff 0%,#7e00ff 100%);color:#fff;box-shadow:0 0 0 3px #fffbe6,0 8px 28px rgba(126,0,255,0.25);font-size:2.1rem;border-radius:50%;transition:box-shadow 0.2s,transform 0.2s;outline:2.5px solid #7e00ff;outline-offset:2px;">
+          <i class="fas fa-magic"></i>
+        </button>
+        <!-- WhatsApp - Último -->
+        <a href="https://wa.me/5549130325" target="_blank" class="fab-btn fab-whatsapp" title="WhatsApp" aria-label="WhatsApp"
+           style="width:64px;height:64px;background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:#fff;box-shadow:0 8px 28px rgba(37,211,102,0.3);font-size:2rem;text-decoration:none;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s,transform 0.2s;">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+    
+    <main class="login-main">
+      <div class="login-container" style="display:flex;flex-direction:column;align-items:center;">
+        <!-- Logo editable en login -->
+        <div id="logo-box-login" class="logo-float" style="width:220px;height:220px;background:linear-gradient(135deg,#fffbe6 70%,#ffd8b0 100%);border-radius:32px;box-shadow:0 8px 32px #ffb88c55,0 2px 16px #ff980055;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;margin-bottom:24px;transition:width 0.3s,height 0.3s;">
+          <i class="fas fa-cubes" id="main-logo-login" style="font-size:80px; color:#43cea2; text-shadow: 0 4px 8px rgba(67, 206, 162, 0.3); margin: 20px 0;" title="Logo SAKORM'S"></i>
+          <div id="logo-btns-login" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:2;pointer-events:none;opacity:0;transition:opacity 0.3s;">
+            <input type="file" id="logo-input-login" accept="image/*" style="display:none;" />
+            <button id="btn-modificar-login" type="button" style="background:#ffb74d;color:#fffbe6;border:none;border-radius:8px;padding:8px 18px;font-size:1.08rem;font-weight:700;box-shadow:0 2px 8px #ffb88c55;cursor:pointer;pointer-events:auto;">Modificar</button>
+            <div style="display:flex;gap:8px;">
+              <button id="btn-guardar-login" type="button" style="background:#43cea2;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:1.05rem;font-weight:700;box-shadow:0 2px 8px #43cea255;cursor:pointer;pointer-events:auto;">Guardar</button>
+              <button id="btn-cancelar-login" type="button" style="background:#ff6f61;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:1.05rem;font-weight:700;box-shadow:0 2px 8px #ff6f6155;cursor:pointer;pointer-events:auto;">Cancelar</button>
+            </div>
+          </div>
+        </div>
+        <div class="login-card animate-in">
+          <h2 id="login-title"><i class="fas fa-cube"></i> Bienvenido a SAKORM'S Inventory</h2>
+          <div class="neon-line-strong" aria-hidden="true"></div>
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect width='120' height='120' rx='18' ry='18' fill='%23ffd8b0'/><text x='50%' y='55%' font-size='28' text-anchor='middle' fill='%23ff6f61' font-family='Arial' font-weight='700'>SAK</text></svg>" alt="Decoración bienvenida" style="width:90px;display:block;margin:0 auto 10px auto;border-radius:18px;box-shadow:0 2px 12px #ffb88c99;">
+          <p class="login-welcome" style="font-size:1.45rem; font-weight:700;">Gestiona tu inventario de forma segura y eficiente.<br><span class="login-tip"><i class="fas fa-shield-alt"></i> Consejo: Nunca compartas tu contraseña y usa una combinación segura.</span></p>
+          <div style="margin:12px 0 18px 0;display:flex;align-items:center;gap:10px;justify-content:center;">
+            <span style="color:#ff9800;font-size:1.1rem;"><i class="fas fa-lightbulb"></i> Tip: Puedes usar la calculadora digital integrada.</span>
+            <span style="color:#ff6f61;font-size:1.1rem;"><i class="fas fa-robot"></i> Mejora tu experiencia con AI.</span>
+          </div>
+          <!-- Formulario de login -->
+          <form id="login-form" autocomplete="off" style="display:block;" role="form" aria-labelledby="login-title">
+            <label for="email"><i class="fas fa-envelope"></i> Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="usuario@correo.com" required autofocus>
+            <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
+            <div class="input-with-btn" style="position:relative;display:flex;align-items:center;">
+              <input type="password" id="password" name="password" placeholder="Contraseña" required style="flex:1;padding-right:44px;">
+              <button type="button" id="toggle-password" aria-label="Mostrar contraseña" title="Mostrar contraseña" style="position:absolute;right:12px;background:transparent;border:none;cursor:pointer;color:#6c5ce7;font-size:1.12rem;padding:6px;">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <label for="access-key" style="margin-top:10px;"><i class="fas fa-key"></i> Clave de acceso (opcional)</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" id="access-key" name="access-key" placeholder="Clave de acceso entregada por administrador" style="flex:1;">
+              <button type="button" id="access-key-help" title="¿Qué es esto?" style="background:transparent;border:none;color:#6c5ce7;cursor:pointer;padding:6px;">¿?</button>
+            </div>
+            <div id="access-key-hint" class="input-hint" style="display:none;color:#9aa4b2;font-size:0.92rem;margin-top:6px;">Si tienes una clave de acceso, introdúcela para iniciar sesión como cliente. Esta clave es de un solo uso por cliente y expira tras activación.</div>
+            <div id="login-error" class="input-error" style="display:none;"></div>
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:stretch;">
+              <button type="submit" class="btn-login" style="width:100%;max-width:420px;margin:0 auto;padding:14px 20px;border-radius:14px;background:linear-gradient(90deg,#ffb07a 0%,#ff7b6b 100%);color:#fff;font-weight:800;font-size:1.05rem;border:none;">Ingresar 🔐 <span class="pulse-emoji">✨</span></button>
+              <button type="button" id="btn-admin-login" class="btn-login btn-admin" style="width:100%;max-width:420px;margin:0 auto;padding:14px 20px;border-radius:14px;background:linear-gradient(90deg,#ff8f6a 0%,#ff5c54 100%);color:#fff;font-weight:800;font-size:1.02rem;border:none;cursor:pointer;" data-onclick="openAdminLoginModal()" aria-haspopup="dialog" aria-controls="admin-login-modal-backdrop">Ingresar como administrador 🛡️</button>
+            </div>
+            <div class="login-extra-links">
+              <a href="javascript:void(0)" role="button" tabindex="0" data-onclick="mostrarRecuperar" style="color:#ff9800;"><i class="fas fa-key"></i> ¿Olvidaste tu contraseña?</a>
+                <a href="javascript:void(0)" role="button" tabindex="0" data-onclick="mostrarRegistro" style="color:#0fffc1;"><i class="fas fa-user-plus"></i> Crear cuenta nueva</a>
+            </div>
+          </form>
+          <!-- Formulario de registro -->
+          <h3 id="register-title" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Formulario de registro</h3>
+          <form id="register-form" autocomplete="off" style="display:none;" role="form" aria-labelledby="register-title">
+              <label for="reg-nombre"><i class="fas fa-user"></i> Nombre de usuario</label>
+              <input type="text" id="reg-nombre" name="reg-nombre" placeholder="Tu nombre de usuario" required>
+            <label for="reg-email"><i class="fas fa-envelope"></i> Correo electrónico</label>
+            <input type="email" id="reg-email" name="reg-email" placeholder="usuario@correo.com" required>
+            <label for="reg-password"><i class="fas fa-lock"></i> Contraseña</label>
+            <input type="password" id="reg-password" name="reg-password" placeholder="Contraseña" required>
+            <div id="register-error" class="input-error" style="display:none;"></div>
+            <button type="submit" class="btn-login">Registrarse 🧾</button>
+            <div class="register-link"><a href="javascript:void(0)" role="button" tabindex="0" data-onclick="mostrarLogin">¿Ya tienes cuenta? Inicia sesión</a></div>
+          </form>
+          <!-- Formulario de recuperación -->
+          <h3 id="recover-title" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Formulario de recuperación</h3>
+          <form id="recover-form" autocomplete="off" style="display:none;" role="form" aria-labelledby="recover-title">
+            <label for="rec-email"><i class="fas fa-envelope"></i> Correo electrónico</label>
+            <input type="email" id="rec-email" name="rec-email" placeholder="usuario@correo.com" required>
+            <div id="recover-error" class="input-error" style="display:none;"></div>
+            <button type="submit" class="btn-login">Recuperar contraseña 🔑</button>
+            <div class="register-link"><a href="javascript:void(0)" role="button" tabindex="0" data-onclick="mostrarLogin">Volver a iniciar sesión</a></div>
+          </form>
+          <!-- Login social -->
+          <div class="social-login">
+            <p>O ingresa con:</p>
+            <div class="social-buttons">
+              <button class="btn-social google" data-onclick="socialLogin('google')" title="Google" type="button"><i class="fab fa-google"></i></button>
+              <button class="btn-social facebook" data-onclick="socialLogin('facebook')" title="Facebook" type="button"><i class="fab fa-facebook-f"></i></button>
+              <button class="btn-social twitter" data-onclick="socialLogin('twitter')" title="Twitter" type="button"><i class="fab fa-twitter"></i></button>
+              <button class="btn-social instagram" data-onclick="socialLogin('instagram')" title="Instagram" type="button"><i class="fab fa-instagram"></i></button>
+            </div>
+          </div>
+          <div class="login-help">
+            <p><i class="fas fa-info-circle"></i> ¿Necesitas ayuda? <a href="#">Contáctanos</a> o revisa la <a href="#">documentación</a>.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer class="main-footer login-footer-static">
+      <div class="footer-row">
+        <div class="footer-brand">
+          <span class="footer-logo"><i class="fas fa-cube"></i></span>
+          <span class="footer-title">SAKORM'S Inventory</span>
+        </div>
+        <nav class="footer-nav">
+          <a href="#" title="Inicio"><i class="fas fa-home"></i> Inicio</a>
+          <a href="#" title="Soporte"><i class="fas fa-headset"></i> Soporte</a>
+          <a href="#" title="Ayuda"><i class="fas fa-question-circle"></i> Ayuda</a>
+          <a href="#" title="Política de Privacidad"><i class="fas fa-user-shield"></i> Privacidad</a>
+        </nav>
+        <div class="footer-contact">
+          <span><i class="fas fa-envelope"></i> contacto@sakorms.org</span>
+          <span><i class="fas fa-phone"></i> +52 55 4913 0325</span>
+        </div>
+        <div class="footer-icons">
+          <a href="https://wa.me/5549130325" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-copy">&copy; 2025 SAKORM'S-IT. Todos los derechos reservados. | <a href="#">Términos y condiciones</a></div>
+    </footer>
+    
+    <!-- Modal de Calculadora -->
+    <div id="calculatorModal" class="calculator-modal">
+      <div class="calculator-container">
+        <div class="calculator-header">
+          <h2>🧮 Calculadora</h2>
+          <button type="button" class="calc-close" data-onclick="toggleCalculator()">&times;</button>
+        </div>
+        <div class="calculator">
+          <input type="text" id="calcDisplay" class="calc-display" readonly value="0">
+          <!-- Compact toolbar: toggle historial y copiar resultado (no alarga la caja) -->
+          <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;margin-top:8px;">
+            <button type="button" id="btnToggleHistory" class="calc-btn" title="Mostrar historial" style="padding:6px 8px;font-size:0.9rem;min-width:40px;">📋</button>
+            <button type="button" id="btnCopyResult" class="calc-btn" title="Copiar resultado" style="padding:6px 8px;font-size:0.9rem;min-width:40px;background:#43cea2;color:#fff;">📋</button>
+          </div>
+
+          <div id="calcHistory" style="margin-top:10px;padding:8px;background:#fff8f0;border-radius:8px;max-height:120px;overflow-y:auto;font-size:0.9rem;color:#ff9800;border:1px solid #ffb74d;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <strong style="color:#ff9800;">📋 Historial</strong>
+              <button type="button" id="btnClearHistory" title="Limpiar historial" style="background:transparent;border:none;color:#ff6f61;font-weight:700;cursor:pointer;padding:4px 6px;border-radius:6px;">🗑️</button>
+            </div>
+            <div id="historyList" style="display:flex;flex-direction:column;gap:6px;"></div>
+          </div>
+
+          <div class="calc-buttons">
+            <button class="calc-btn calc-func" data-onclick="calcClear()">C</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('/')">/</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('*')">×</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('-')">−</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('7')">7</button>
+            <button class="calc-btn" data-onclick="calcPress('8')">8</button>
+            <button class="calc-btn" data-onclick="calcPress('9')">9</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('+')">+</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('4')">4</button>
+            <button class="calc-btn" data-onclick="calcPress('5')">5</button>
+            <button class="calc-btn" data-onclick="calcPress('6')">6</button>
+            <button class="calc-btn calc-func" data-onclick="calcPress('.')">.</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('1')">1</button>
+            <button class="calc-btn" data-onclick="calcPress('2')">2</button>
+            <button class="calc-btn" data-onclick="calcPress('3')">3</button>
+            <button class="calc-btn calc-equal" data-onclick="calcEquals()" style="grid-row: span 2;">=</button>
+            
+            <button class="calc-btn" data-onclick="calcPress('0')" style="grid-column: span 2;">0</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chatbot AI flotante -->
+    <div id="aiChatbot" class="ai-chatbot">
+      <div class="ai-chat-header">
+        <span><i class="fas fa-robot ai-anim"></i> Asistente Inteligente</span>
+        <button class="ai-chat-close" type="button" data-onclick="toggleAIChat()">&times;</button>
+      </div>
+      <div class="ai-chat-body" id="aiChatBody">
+        <div class="ai-chat-msg ai-chat-msg-bot">¡Hola! Soy tu asistente inteligente 🤖. ¿En qué puedo ayudarte hoy?</div>
+      </div>
+      <form class="ai-chat-input" onsubmit="return sendAIMessage(event)">
+        <input type="text" id="aiChatInput" placeholder="Escribe tu pregunta..." autocomplete="off" />
+        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+      </form>
+      <div class="ai-chat-status" id="aiChatStatus">Pensando...</div>
+    </div>
+
+    <!-- Modal estático para diálogos (evita creación dinámica por ui.js) -->
+    <div id="modal-dialogo" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:120000;">
+      <div class="modal-content" style="position:relative;max-width:720px;width:calc(100% - 40px);background:#fff;border-radius:12px;padding:18px;color:#111;box-shadow:0 18px 56px rgba(0,0,0,0.28);">
+        <span id="modal-dialogo-icono" style="display:inline-block;margin-right:8px;font-size:20px;">ℹ️</span>
+        <h2 id="modal-dialogo-titulo" style="display:inline-block;margin:0;font-size:1.1rem;vertical-align:middle"></h2>
+        <div id="modal-dialogo-mensaje" style="margin-top:12px;line-height:1.4;color:inherit"></div>
+        <div id="modal-dialogo-input-container" style="display:none;margin-top:10px;"><input id="modal-dialogo-input" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd"/></div>
+        <div id="modal-dialogo-botones" style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;"></div>
+        <button id="cerrar-modal-dialogo" aria-label="Cerrar diálogo" style="position:absolute;top:10px;right:10px;background:#fff;border:1px solid #eee;border-radius:8px;padding:6px 8px;cursor:pointer">&times;</button>
+      </div>
+    </div>
+
+    <!-- Módulos de la aplicación -->
+    <script src="/Sakorms.org/Inventory-web1.5/js/inline-handler-polyfill.js" defer></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/data-onclick-wrappers.js?t=20260221" defer></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/config.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/ui.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/calculator.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/auth.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/ai.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/test.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/js/helpers.js?t=20260119224912"></script>
+    <script src="/Sakorms.org/Inventory-web1.5/login.js?t=20260119224912"></script>
+    
+    <!-- Admin login modal (inline) -->
+    <div id="admin-login-modal-backdrop" class="dialog-backdrop" style="display:none;" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="dialog" id="admin-login-modal" role="document" style="min-width:320px;max-width:420px;padding:18px;">
+        <h3 style="margin:0 0 8px 0;color:#fff;font-size:1.05rem">Ingresar como Administrador</h3>
+        <div style="margin-bottom:8px">
+          <label for="admin-email" style="display:block;color:#cfe6ff;margin-bottom:6px">Usuario o correo</label>
+          <input type="text" id="admin-email" placeholder="admin@dominio.com" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf4ff">
+        </div>
+        <div style="margin-bottom:8px">
+          <label for="admin-password" style="display:block;color:#cfe6ff;margin-bottom:6px">Contraseña</label>
+          <input type="password" id="admin-password" placeholder="Contraseña" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#eaf4ff">
+        </div>
+        <div id="admin-login-error" class="muted" style="display:none;margin-bottom:8px;color:#ffb4b4"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+          <button type="button" id="admin-login-cancel" class="btn-login" style="background:transparent;color:var(--accent-2);border:1px solid rgba(255,255,255,0.06);padding:8px 12px;">Cancelar</button>
+          <button type="button" id="admin-login-submit" class="btn-login" style="background:linear-gradient(90deg,#43cea2 0%,#25c06b 100%);color:#041016;padding:10px 14px;border-radius:10px;">Entrar como Administrador</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    (function(){
+      function openAdminLoginModal(){
+        try{
+          const bd = document.getElementById('admin-login-modal-backdrop');
+          if(!bd) return;
+          bd.style.display = 'flex';
+          // force active state for CSS rules that rely on .active
+          bd.classList.add('active');
+          bd.setAttribute('aria-hidden','false');
+          try{ document.body.classList.add('dialog-open'); }catch(e){}
+          setTimeout(function(){ const em=document.getElementById('admin-email'); if(em){ em.focus(); em.select && em.select(); } },60);
+        }catch(e){ console.warn('openAdminLoginModal failed', e); }
+      }
+      function closeAdminLoginModal(){
+        try{
+          const bd = document.getElementById('admin-login-modal-backdrop'); if(!bd) return;
+          bd.classList.remove('active'); bd.setAttribute('aria-hidden','true'); bd.style.display = 'none';
+          try{ document.body.classList.remove('dialog-open'); }catch(e){}
+        }catch(e){ console.warn('closeAdminLoginModal failed', e); }
+      }
+
+      async function submitAdminLogin(){
+        try{
+          const email = (document.getElementById('admin-email') && document.getElementById('admin-email').value || '').trim();
+          const password = (document.getElementById('admin-password') && document.getElementById('admin-password').value) || '';
+          const err = document.getElementById('admin-login-error'); if(err){ err.style.display='none'; err.textContent=''; }
+          if(!email || !password){ if(err){ err.style.display='block'; err.textContent='Por favor completa todos los campos'; } return; }
+          const submitBtn = document.getElementById('admin-login-submit'); if(submitBtn){ submitBtn.disabled = true; submitBtn.dataset.orig = submitBtn.textContent; submitBtn.textContent = 'Validando...'; }
+          try{ if (window.UI && typeof window.UI.showLoader === 'function') window.UI.showLoader('Validando credenciales...'); else showNotification('Validando credenciales...', 'info'); }catch(e){}
+          // If running on localhost, request debug info to get clearer failure reasons from the API
+          const isLocal = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '::1');
+          const payload = { email: email, password: password };
+          if (isLocal) payload.debug = true;
+          const resp = await fetch(buildApiUrl('/api/admin/login_admin.php'), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+          if(!resp.ok){
+            // Try to read JSON error with debug details when available
+            let raw = await resp.text().catch(()=>null);
+            let parsed = null;
+            try { parsed = raw ? JSON.parse(raw) : null; } catch(e){ parsed = null; }
+            const serverMsg = (parsed && (parsed.message || parsed.error)) ? (parsed.message || parsed.error) : (raw || 'Respuesta inválida del servidor');
+            const debugInfo = (parsed && parsed.debug) ? parsed.debug : null;
+            const composed = serverMsg + (debugInfo ? (' — ' + debugInfo) : (' (status ' + resp.status + ')'));
+            if(err){ err.style.display='block'; err.textContent = composed; }
+            // show dialog for clarity with detailed info (safe-escaped)
+            try {
+              const safe = String(composed).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              if (window.UI && typeof window.UI.showDialog === 'function') window.UI.showDialog({ type: 'error', title: 'Error servidor', html: '<p>' + safe + '</p>', autoClose: 8000 });
+              else showDialog({ html: '<p>' + safe + '</p>' });
+            } catch(e){}
+            return;
+          }
+          const ct = (resp.headers.get('content-type')||'').toLowerCase();
+          let data = null;
+          if(ct.indexOf('application/json') !== -1){ data = await resp.json().catch(()=>null); }
+          if(!data){ const t = await resp.text().catch(()=>null); if(err){ err.style.display='block'; err.textContent = t || 'Respuesta inválida del servidor'; } return; }
+          // If server returned debug information, surface it to the developer on localhost
+          if (data && data.debug && isLocal) {
+            try { console.info('login_admin debug:', data.debug); } catch(e){}
+          }
+          if(data.success){
+            try{ showNotification('Bienvenido administrador','success'); }catch(e){}
+            closeAdminLoginModal();
+            // Open the dedicated admin page on success
+            setTimeout(function(){ try { redirectTo('login_admin_skm.html'); } catch(e) { window.location.href = 'login_admin_skm.html'; } }, 400);
+            return;
+          }
+          else {
+            var msg = data && (data.message || data.error) ? (data.message || data.error) : 'Credenciales inválidas';
+            // normalize empty/whitespace-only messages
+            if (typeof msg === 'string' && msg.trim().length === 0) msg = 'Credenciales inválidas';
+            try {
+              if (window.UI && typeof window.UI.showDialog === 'function') {
+                window.UI.showDialog({
+                  type: 'error',
+                  title: 'Acceso denegado',
+                  icon: '❌',
+                  html: '<p style="margin:0 0 6px 0;color:inherit;">' + (String(msg).replace(/</g,'&lt;').replace(/>/g,'&gt;')) + '</p>',
+                  buttons: [ { text: 'Cerrar', class: 'btn primary', action: 'close' } ],
+                  autoClose: 6000
+                });
+              } else if (typeof showDialog === 'function') {
+                showDialog({ html: '<p>' + (String(msg).replace(/</g,'&lt;').replace(/>/g,'&gt;')) + '</p>' });
+              } else {
+                showNotification(msg, 'error');
+              }
+            } catch(e) { console.warn('error showing failure dialog', e); }
+            if(err){ err.style.display='block'; err.textContent = msg; }
+          }
+        }catch(e){ console.error('submitAdminLogin error', e); const err = document.getElementById('admin-login-error'); if(err){ err.style.display='block'; err.textContent = 'Error al procesar la solicitud'; } }
+        finally { try{ const submitBtn = document.getElementById('admin-login-submit'); if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent = submitBtn.dataset.orig || 'Entrar como Administrador'; } if (window.UI && typeof window.UI.hideLoader === 'function') window.UI.hideLoader(); }catch(e){} }
+      }
+
+      // Expose as globals so inline-handler-polyfill and other inline callers can access them
+      try { window.openAdminLoginModal = openAdminLoginModal; } catch(e){}
+      try { window.closeAdminLoginModal = closeAdminLoginModal; } catch(e){}
+      try { window.submitAdminLogin = submitAdminLogin; } catch(e){}
+
+      // Attach handlers idempotently
+      document.addEventListener('DOMContentLoaded', function(){
+        try{
+          const btn = document.getElementById('btn-admin-login'); if(btn && !btn._adminBound){ btn.addEventListener('click', function(e){ e.preventDefault(); openAdminLoginModal(); }); btn._adminBound = true; }
+          const submitBtn = document.getElementById('admin-login-submit'); if(submitBtn && !submitBtn._bound){ submitBtn.addEventListener('click', function(e){ e.preventDefault(); submitAdminLogin(); }); submitBtn._bound = true; }
+          const cancel = document.getElementById('admin-login-cancel'); if(cancel && !cancel._bound){ cancel.addEventListener('click', function(e){ e.preventDefault(); closeAdminLoginModal(); }); cancel._bound = true; }
+          const bd = document.getElementById('admin-login-modal-backdrop'); if(bd && !bd._bound){ bd.addEventListener('click', function(e){ if(e.target === bd) closeAdminLoginModal(); }); bd._bound = true; }
+          document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeAdminLoginModal(); } });
+        }catch(e){ console.warn('admin modal init failed', e); }
+      });
+    })();
+    </script>
+    <!-- Mejoras UX para diálogos: estilos y wrapper para evitar diálogos amontonados e interacción con fondo -->
+    <style>
+      /* Modal base: center content, overlay, accessible focus trap hint */
+      #modal-dialogo { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.36); z-index: 100100; pointer-events: auto; }
+      #modal-dialogo .modal-content { background: #fff; color: #111; border-radius: 12px; padding: 18px 18px 14px 18px; max-width: 640px; width: min(94%, 640px); box-shadow: 0 18px 56px rgba(0,0,0,0.28); position: relative; font-family: Poppins, system-ui, -apple-system, sans-serif; }
+      #modal-dialogo #modal-dialogo-titulo { margin: 0 0 8px 0; font-size: 1.15rem; font-weight:800; }
+      #modal-dialogo #modal-dialogo-mensaje { margin-bottom: 12px; line-height:1.5; }
+      #modal-dialogo #modal-dialogo-botones { display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
+      #modal-dialogo button { cursor:pointer; }
+      /* When a dialog is open, make main content inert-ish to assist screen readers and prevent interaction */
+      body.dialog-open main, body.dialog-open #floating-buttons-wrapper, body.dialog-open footer { filter: blur(1px) brightness(0.9); pointer-events: none; user-select: none; }
+
+      /* Admin login modal backdrop (ensure it's full-screen and centered even if global .dialog-backdrop is missing) */
+      #admin-login-modal-backdrop { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.72); z-index: 13000; pointer-events: auto; }
+      #admin-login-modal-backdrop.active { display: flex; }
+      #admin-login-modal { max-width: 460px; width: calc(100% - 40px); border-radius: 14px; box-shadow: 0 18px 60px rgba(2,6,23,0.8); background: linear-gradient(180deg,#071026,#0b1220); color: #eaf4ff; }
+      #admin-login-modal input { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #eaf4ff; }
+    </style>
+
+    <script>
+      (function(){
+        try {
+          // Wrap UI.showDialog to manage dialog-open class and ensure queued dialogs don't stack (UI already queues, this improves background handling)
+          if (window.UI && typeof window.UI.showDialog === 'function' && !window.UI._wrappedShowDialog) {
+            const _orig = window.UI.showDialog.bind(window.UI);
+            window.UI.showDialog = function(opts){
+              try { document.body.classList.add('dialog-open'); } catch(e){}
+              const handle = _orig(opts);
+              // Ensure we restore state when closed
+              const originalClose = (handle && handle.close) ? handle.close.bind(handle) : null;
+              if (originalClose) {
+                handle.close = function(){ try { originalClose(); } catch(e){} try { document.body.classList.remove('dialog-open'); } catch(e){} };
+              } else {
+                // if no handle returned, remove class after a timeout guard (safety)
+                setTimeout(function(){ try { document.body.classList.remove('dialog-open'); } catch(e){} }, (opts && opts.autoClose) ? (Number(opts.autoClose) + 120) : 8000);
+              }
+              return handle || { close: function(){ try { document.body.classList.remove('dialog-open'); } catch(e){} } };
+            };
+            window.UI._wrappedShowDialog = true;
+          }
+        } catch(e) { console.warn('dialog wrapper install failed', e); }
+      })();
+    </script>
+    <script>
+      if (typeof window.__welcomeInitialized === 'undefined') {
+        window.__welcomeInitialized = true;
+        (function initWelcome() {
+          let welcomeTimeRemaining = 25;
+          let welcomeIntervalId = null;
+          
+          function closeWelcome() {
+            const welcomeDialog = document.getElementById('welcome-dialog');
+            if (welcomeDialog) {
+              welcomeDialog.style.display = 'none';
+              welcomeDialog.style.visibility = 'hidden';
+              welcomeDialog.style.opacity = '0';
+              welcomeDialog.style.pointerEvents = 'none';
+            }
+            if (welcomeIntervalId) {
+              clearInterval(welcomeIntervalId);
+            }
+          }
+          
+          function startTimer() {
+            const welcomeTimerDisplay = document.getElementById('welcome-timer');
+            const welcomeDialog = document.getElementById('welcome-dialog');
+            const closeWelcomeBtn = document.getElementById('close-welcome');
+            
+            welcomeIntervalId = setInterval(() => {
+              welcomeTimeRemaining--;
+              if (welcomeTimerDisplay) {
+                welcomeTimerDisplay.textContent = `Este mensaje se cerrará en ${welcomeTimeRemaining} segundos...`;
+              }
+              if (welcomeTimeRemaining <= 0) {
+                closeWelcome();
+              }
+            }, 1000);
+            
+            if (closeWelcomeBtn) {
+              closeWelcomeBtn.onclick = function(e) {
+                e.preventDefault();
+                closeWelcome();
+              };
+            }
+            
+            if (welcomeDialog) {
+              welcomeDialog.onclick = function(e) {
+                if (e.target === welcomeDialog) {
+                  closeWelcome();
+                }
+              };
+            }
+          }
+          
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startTimer);
+          } else {
+            startTimer();
+          }
+        })();
+      }
+    </script>
+    <script>
+      // Ensure FAB buttons on login behave like index: call global toggles and manage "active" state
+      (function(){
+        try {
+          const map = [
+            {id:'btnCalc', fn:'toggleCalculator'},
+            {id:'btnAIChat', fn:'toggleAIChat'},
+            {id:'btnAIEnhance', fn:'toggleAIEnhancements'}
+          ];
+          function safeCall(fnName){ if (typeof window[fnName] === 'function') { try{ window[fnName](); }catch(e){ console.warn(fnName+' error',e); } } else { console.info(fnName+' not defined'); } }
+          map.forEach(m => {
+            const el = document.getElementById(m.id);
+            if (!el) return;
+            // avoid double-binding
+            if (el._fabBound) return;
+            el.addEventListener('click', function(e){ e.preventDefault(); safeCall(m.fn); // toggle visual active class
+              try { el.classList.toggle('active'); } catch(e){}
+            });
+            el._fabBound = true;
+          });
+          // small helper to reflect current state if possible
+          function updateFabStates(){
+            try {
+              const calc = document.getElementById('btnCalc'); if (calc) {
+                const modal = document.querySelector('.calculator-modal'); if (modal) calc.classList.toggle('active', modal.classList.contains('active'));
+              }
+              const ai = document.getElementById('btnAIChat'); if (ai) {
+                const chat = document.getElementById('aiChatbot'); if (chat) ai.classList.toggle('active', chat.classList.contains('active'));
+              }
+            } catch(e){ }
+          }
+          // run once on load
+          setTimeout(updateFabStates, 300);
+        } catch(e){ console.warn('FAB init failed', e); }
+      })();
+    </script>
+      <script>
+        // Small UX: show hint when user clicks the help button for access key
+          (function(){
+            try {
+              const help = document.getElementById('access-key-help');
+              const hint = document.getElementById('access-key-hint');
+              if (!help || !hint) return;
+              help.addEventListener('click', function(e){ e.preventDefault(); hint.style.display = (hint.style.display === 'none' || !hint.style.display) ? 'block' : 'none'; });
+            } catch(e) { console.warn('access-key help attach failed', e); }
+          })();
+
+        // Ensure critical form handlers are attached even if inline attributes fail
+        (function(){
+          try {
+            const loginForm = document.getElementById('login-form');
+            if (loginForm && !loginForm._bound) {
+              loginForm.addEventListener('submit', function(e){ if (typeof validarLogin === 'function') { e.preventDefault(); validarLogin(e); } });
+              loginForm._bound = true;
+            }
+            const regForm = document.getElementById('register-form');
+            if (regForm && !regForm._bound) {
+              regForm.addEventListener('submit', function(e){ if (typeof registrarCuenta === 'function') { e.preventDefault(); registrarCuenta(e); } });
+              regForm._bound = true;
+            }
+            const recForm = document.getElementById('recover-form');
+            if (recForm && !recForm._bound) {
+              recForm.addEventListener('submit', function(e){ if (typeof recuperarCuenta === 'function') { e.preventDefault(); recuperarCuenta(e); } });
+              recForm._bound = true;
+            }
+          } catch(e){ console.warn('Attach form handlers failed', e); }
+        })();
+
+        // Small UX: animate welcome dialog hide after timeout
+        (function(){ try { const welcome = document.getElementById('welcome-dialog'); if (welcome) { setTimeout(()=>{ welcome.style.transition='opacity 0.6s'; welcome.style.opacity='0'; setTimeout(()=>welcome.remove(),800); },25000); } } catch(e){} })();
+      </script>
+</body>
+</html>

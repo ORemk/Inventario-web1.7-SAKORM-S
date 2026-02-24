@@ -1,0 +1,794 @@
+/* ARCHIVADO: style.css
+   Este archivo fue consolidado en `app.css` y movido a
+   `ARCHIVADOS/duplicados_20260204_085141/style.css`.
+   Mantener este placeholder para compatibilidad de caché.
+*/
+:root {}
+
+/* EOF - style.css (placeholder) */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+    color: #2c3e50;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+button:focus {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    margin: 20px auto;
+    max-width: 1600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    transition: box-shadow 0.3s, transform 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* ========================================
+   HEADER SECTION - Main Header Styles
+   ======================================== */
+
+.main-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    padding: 2.5rem 1rem;
+    animation: fadeIn 1.5s ease-in-out;
+    border-radius: 0;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.main-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.main-header h1 i {
+    font-size: 2.8rem;
+    animation: bounce 2s infinite;
+}
+
+/* Estilos mejorados para la barra de navegación */
+/* ========================================
+   NAVBAR - Enhanced Modern Styling
+   ======================================== */
+
+.navbar {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 255, 0.96) 100%);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(102, 126, 234, 0.08);
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Navbar Brand/Logo */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+.navbar-brand i {
+    font-size: 28px;
+}
+
+.navbar-brand-text {
+    letter-spacing: 1px;
+}
+
+/* Navbar Menu */
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* Navbar Items */
+.navbar-item {
+    position: relative;
+    margin: 0;
+}
+
+.navbar-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    white-space: nowrap;
+}
+
+.navbar-link i {
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar-link span {
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 3px;
+    transition: width 0.3s ease-in-out;
+}
+
+.navbar-link:hover {
+    color: #764ba2;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.08) 100%);
+    transform: translateY(-2px);
+    padding: 10px 18px;
+}
+
+.navbar-link:hover::before {
+    width: 100%;
+}
+
+.navbar-link:hover i {
+    transform: scale(1.2) rotate(5deg);
+    color: #764ba2;
+}
+
+/* Active State */
+.navbar-link.active {
+    color: #764ba2;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.navbar-link.active::before {
+    width: 100%;
+}
+
+/* Hamburger Menu Toggle for Mobile */
+.navbar-toggle {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-toggle span {
+    width: 24px;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+    display: block;
+}
+
+.navbar-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(10px, 10px);
+}
+
+.navbar-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.navbar-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 12px 20px;
+        flex-wrap: wrap;
+    }
+
+    .navbar-brand {
+        font-size: 18px;
+        min-width: auto;
+    }
+
+    .navbar-brand-text {
+        display: none;
+    }
+
+    .navbar-toggle {
+        display: flex;
+    }
+
+    .navbar-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 255, 0.96) 100%);
+        flex-direction: column;
+        gap: 5px;
+        padding: 15px 20px;
+        margin-top: 5px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .navbar-menu.active {
+        max-height: 400px;
+    }
+
+    .navbar-item {
+        width: 100%;
+    }
+
+    .navbar-link {
+        padding: 12px 15px;
+        width: 100%;
+        justify-content: flex-start;
+        font-size: 15px;
+    }
+
+    .navbar-link::before {
+        height: 2px;
+        left: 0;
+        bottom: 0;
+    }
+
+    .navbar-link:hover::before {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-container {
+        padding: 10px 15px;
+    }
+
+    .navbar-brand {
+        font-size: 16px;
+    }
+
+    .navbar-link {
+        padding: 10px 12px;
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .navbar-link i {
+        font-size: 14px;
+    }
+
+    .navbar-menu {
+        padding: 10px 15px;
+    }
+}
+
+form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    animation: slideIn 1s ease-out;
+    transition: background-color 0.3s;
+}
+
+form:hover {
+    background-color: #f1f1f1;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 2px solid #e0e7ff;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus,
+input[type="date"]:focus,
+select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="file"]:hover,
+input[type="date"]:hover,
+select:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15)
+
+
+/* Estilos para los campos de categoría */
+#categoria-producto, #nueva-categoria {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 2px solid #e0e7ff;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+#categoria-producto:focus, #nueva-categoria:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Botones generales mejorados */
+button {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Botones específicos */
+.btn-agregar, .btn-agregar-producto {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-agregar:hover, .btn-agregar-producto:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-editar {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+}
+
+.btn-editar:hover {
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+}
+
+.btn-eliminar {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: white;
+}
+
+.btn-eliminar:hover {
+    box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+}
+
+.btn-exportar {
+    background: linear-gradient(135deg, #43cea2 0%, #38a169 100%);
+    color: white;
+}
+
+.btn-exportar:hover {
+    box-shadow: 0 8px 25px rgba(67, 206, 162, 0.4);
+}
+
+/* Mejora de la tabla */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+}
+
+th, td {
+    padding: 16px 20px;
+    text-align: center;
+    border-bottom: 1px solid #e0e7ff;
+    font-size: 14px;
+}
+
+th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+tr:nth-child(odd) {
+    background-color: #f8f9ff;
+}
+
+tr:nth-child(even) {
+    background-color: #f0f4ff;
+}
+
+tr:hover {
+    background: linear-gradient(90deg, #667eea15 0%, #764ba215 100%);
+    transition: background-color 0.3s ease-in-out;
+}
+
+td img {
+    border-radius: 8px;
+    max-width: 50px;
+    max-height: 50px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+
+/* Animaciones mejoradas */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-30px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Estilos para etiquetas (labels) */
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 15px;
+    transition: color 0.3s ease;
+}
+
+label:hover {
+    color: #667eea;
+}
+
+label i {
+    margin-right: 8px;
+    color: #667eea;
+}
+
+/* Secciones mejoradas */
+.section {
+    margin-bottom: 30px;
+    animation: slideUp 0.6s ease-out;
+}
+
+.section h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section h2 i {
+    color: #667eea;
+}
+
+/* Mejora del footer */
+.footer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    padding: 30px 15px;
+    margin-top: 40px;
+    border-radius: 0;
+    box-shadow: 0 -10px 30px rgba(102, 126, 234, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 -15px 40px rgba(102, 126, 234, 0.3);
+}
+
+/* Mensajes de estado */
+/* Legacy `.tabla-mensaje` styles removed - toasts handled by UI helpers now */
+
+/* Calculadora digital mejorada */
+/* Calculator modal styling handled by custom.css with opacity/visibility approach */
+.calculator-modal h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 1.25rem;
+  color: #ff9800;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.calculator-display {
+  width: 100%;
+  height: 44px;
+  margin-bottom: 14px;
+  font-size: 1.25rem;
+  text-align: right;
+  padding: 7px 10px;
+  border: 1.5px solid #ff9800;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(255,152,0,0.1);
+  color: #ff9800;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.calculator-functions {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+.calculator-functions button {
+  font-size: 0.85rem;
+  padding: 6px;
+  background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(255,152,0,0.15);
+}
+.calculator-functions button:hover {
+  background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+  transform: translateY(-2px);
+}
+.calculator-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.calculator-keys button {
+  height: 48px;
+  font-size: 1.15rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255,152,0,0.15);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.calculator-keys button:hover, .calculator-keys button:focus {
+  background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+  transform: scale(1.07);
+}
+.calculator-keys .key-equals {
+  background: #43cea2;
+  color: #fff;
+}
+.calculator-keys .key-equals:hover {
+  background: #2bb896;
+  color: #fff;
+}
+.calculator-keys .key-clear {
+  background: #db4437;
+  color: #fff;
+}
+.calculator-keys .key-clear:hover {
+  background: #e57373;
+  color: #fff;
+}
+.calculator-keys .key-op {
+  background: #2196f3;
+  color: #fff;
+}
+.calculator-keys .key-op:hover {
+  background: #1976d2;
+  color: #fff;
+}
+.calculator-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #185a9d;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.calculator-close:hover { color: #db4437; }
+.calculator-history {
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  font-size: 0.98rem;
+  color: #185a9d;
+  max-height: 80px;
+  overflow-y: auto;
+  box-shadow: 0 1px 4px rgba(24,90,157,0.04);
+}
+.calculator-history-title {
+  font-size: 0.95rem;
+  color: #2196f3;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+.copy-result-btn {
+  background: #43cea2;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 4px 10px;
+  font-size: 0.95rem;
+  margin-left: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-result-btn:hover { background: #185a9d; }
+
+/* Estilos responsivos para calculadora en dispositivos móviles */
+@media (max-width: 600px) {
+  .calculator-keys {
+    gap: 6px;
+  }
+  .calculator-keys button {
+    height: 40px;
+    font-size: 1rem;
+  }
+  .calculator-functions button {
+    font-size: 0.75rem;
+    padding: 4px;
+  }
+  .calculator-display {
+    height: 36px;
+    font-size: 1.1rem;
+  }
+}
+
+/* Asegura que los botones flotantes no sean afectados por reglas globales de display/visibility */
+.fab-btn,
+.fab-calc,
+.fab-ai,
+.fab-whatsapp,
+.fab-login {
+    display: flex !important;
+    visibility: visible !important;
+    z-index: 10020 !important;
+}
+
+/* No se detectan errores de rutas en este archivo. */

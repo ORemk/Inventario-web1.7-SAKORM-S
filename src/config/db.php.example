@@ -1,0 +1,31 @@
+<?php
+/**
+ * src/config/db.php.example
+ * Plantilla de configuración de base de datos para SQL Server (sqlsrv)
+ * Copia este archivo a `src/config/db.php` y ajusta los valores según tu entorno.
+ * Alternativamente, carga la configuración desde variables de entorno para mayor seguridad.
+ */
+
+return [
+    // Server name o DSN (ej: 'localhost', 'SERVER\\INSTANCE', 'host,port')
+    'serverName' => 'localhost',
+
+    // Database name
+    'database' => 'inventory',
+
+    // Authentication: si usas SQL Server authentication, establece usuario y contraseña.
+    'uid' => '',
+    'pwd' => '',
+
+    // Opciones adicionales para sqlsrv_connect
+    'options' => [
+        'Database' => 'inventory',
+        'CharacterSet' => 'UTF-8',
+        'ConnectionPooling' => false,
+    ],
+
+    // Ejemplo de cómo exponer $conn cuando se incluye este archivo
+    // En `src/config/db.php` esperado uso:
+    // $cfg = require __DIR__ . '/db.php';
+    // $conn = @sqlsrv_connect($cfg['serverName'], $cfg['options']);
+];

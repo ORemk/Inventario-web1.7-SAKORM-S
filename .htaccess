@@ -1,0 +1,8 @@
+
+RewriteEngine On
+RewriteBase /Sakorms.org/Inventory-web1.5/
+
+# No redirecciones globales aquí — evita bucles. Use este archivo para reglas locales.
+# Definir página de error 404 relativa al sitio (opcional)
+ErrorDocument 404 /Sakorms.org/Inventory-web1.5/404.html
+
