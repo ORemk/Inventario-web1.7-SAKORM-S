@@ -5,6 +5,10 @@
  * Uso: Abre en navegador: http://localhost/Sakorms.org/Inventory-web1.5/setup-database.php
  */
 
+// DISABLED FOR SECURITY: This script is disabled to prevent unauthorized database setup.
+// If you need to run it, rename to setup-database.php.bak and remove this die statement.
+die('Setup database script disabled for security reasons. Contact administrator.');
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
