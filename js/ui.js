@@ -484,20 +484,20 @@
         }
     } catch (e) { console.warn('UI enhancement flagging failed', e); }
 
-    // Telemetry helpers: consentimiento y envío anónimo
-    window.UI._telemetryEndpoint = (window.CONFIG && window.CONFIG.apiBase) ? (window.CONFIG.apiBase.replace(/\/$/, '') + '/telemetry.php') : '/api/telemetry.php';
+    // API error handlers
+    window.UI.handleAPIError = function(error, context) {
+        let msg = 'Error de API';
+        if (typeof error === 'string') msg = error;
+        else if (error && error.error) msg = error.error;
+        else if (error && error.message) msg = error.message;
+        else if (error) msg = JSON.stringify(error);
+        if (window.UI.toast) window.UI.toast(msg, 'error', 6000);
+        else console.error('API Error:', error);
+    };
 
-    window.UI._sendTelemetry = function(payload) {
-        try {
-            fetch(window.UI._telemetryEndpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).then(res => {
-                if (!res.ok) console.warn('Telemetry endpoint returned', res.status);
-                return res.json().catch(()=>null);
-            }).then(json => { if (json && json.success) console.info('Telemetry sent'); }).catch(err => console.warn('Telemetry send error', err));
-        } catch (e) { console.warn('Telemetry send failed', e); }
+    window.UI.alertError = function(msg) {
+        if (window.UI.toast) window.UI.toast(msg, 'error', 6000);
+        else alert(msg);
     };
 
     // Bloqueo visual para tareas largas: mostrar solo diálogos y un modal bloqueante
